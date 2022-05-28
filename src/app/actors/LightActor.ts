@@ -8,6 +8,8 @@ export class LightActor extends SceneActor {
     this.parent.addChild(light);
     light.setEulerAngles(45, 0, 0);
 
+    this.entity = light;
+
     return super.init();
   }
 }

@@ -11,6 +11,8 @@ export class CameraActor extends SceneActor {
     this.parent.addChild(camera);
     camera.setPosition(0, 0, 3);
 
+    this.entity = camera;
+
     return super.init();
   }
 }

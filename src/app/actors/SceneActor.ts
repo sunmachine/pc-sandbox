@@ -1,4 +1,5 @@
 export interface SceneActor {
+  entity?: pc.Entity;
   init(): this;
   update?(dt: number): void;
 }
