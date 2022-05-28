@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { runApp } from "@/engine/runApp";
+import { runApp } from "@/app/runApp";
 import { ref, onMounted } from "vue";
 
 const application = ref(null);
