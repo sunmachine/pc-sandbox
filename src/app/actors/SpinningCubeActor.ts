@@ -16,7 +16,7 @@ export class SpinningCubeActor extends SceneActor {
 
   update(dt: number): void {
     if (this.box) {
-      this.box.rotate(10.0 * dt, 20.0 * dt, 30.0 * dt);
+      this.box.rotate(1.0 * dt, 2.0 * dt, 3.0 * dt);
     }
   }
 }
