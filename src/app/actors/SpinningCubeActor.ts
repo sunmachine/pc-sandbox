@@ -20,7 +20,7 @@ export class SpinningCubeActor extends SceneActor<pc.Material> {
     cube.addComponent("render", {
       meshInstances: [meshInstance],
     });
-    this.parent.addChild(cube);
+    this.parent?.addChild(cube);
     cube.setPosition(0, 0, 0);
 
     this.entity = cube;

@@ -8,7 +8,7 @@ export class CameraActor extends SceneActor {
       clearColor: new pc.Color(0.1, 0.1, 0.1),
     });
 
-    this.parent.addChild(camera);
+    this.parent?.addChild(camera);
     camera.setPosition(0, 0, 3);
 
     this.entity = camera;

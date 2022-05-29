@@ -19,7 +19,7 @@ export class GroundPlaneActor extends SceneActor<pc.Material> {
     plane.addComponent("render", {
       meshInstances: [meshInstance],
     });
-    this.parent.addChild(plane);
+    this.parent?.addChild(plane);
     plane.setPosition(0, -1, 0);
 
     this.entity = plane;
