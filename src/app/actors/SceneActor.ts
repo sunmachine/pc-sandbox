@@ -1,7 +1,7 @@
 import type { Scene } from "../scene/Scene";
+import type { Actor } from "./Actor";
 
-export interface SceneActor<TInit = undefined> {
-  entity?: pc.Entity;
+export interface SceneActor<TInit = undefined> extends Actor {
   init(data?: TInit): this;
   update?(dt: number): void;
 }
