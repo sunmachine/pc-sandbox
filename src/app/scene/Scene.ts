@@ -6,5 +6,5 @@ export interface Scene {
 
 export abstract class Scene {
   protected actors: Array<SceneActor> = [];
-  constructor(protected app: pc.Application) {}
+  constructor(public app: pc.Application) {}
 }
