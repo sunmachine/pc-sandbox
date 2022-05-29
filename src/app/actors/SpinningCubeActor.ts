@@ -5,6 +5,7 @@ export class SpinningCubeActor extends SceneActor {
   box?: pc.Entity;
 
   init(): this {
+    const app = this.scene.app;
     this.box = new pc.Entity("cube");
     this.box.addComponent("model", {
       type: "box",

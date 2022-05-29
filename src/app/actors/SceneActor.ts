@@ -1,14 +1,17 @@
-export interface SceneActor {
+import type { Scene } from "../scene/Scene";
+
+export interface SceneActor<TInit = undefined> {
   entity?: pc.Entity;
-  init(): this;
+  init(data?: TInit): this;
   update?(dt: number): void;
 }
 
-export abstract class SceneActor {
-  constructor(protected app: pc.Application, protected parent: pc.Entity) {}
+export abstract class SceneActor<TInit = undefined> {
+  constructor(protected scene: Scene, protected parent: pc.Entity) {}
 
-  init(): this {
-    this.app.on("update", (dt) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  init(_?: TInit): this {
+    this.scene.app.on("update", (dt) => {
       if (this.update !== undefined) {
         this.update(dt);
       }
