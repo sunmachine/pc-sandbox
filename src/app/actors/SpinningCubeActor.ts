@@ -2,8 +2,6 @@ import * as pc from "playcanvas";
 import { SceneActor } from "./SceneActor";
 
 export class SpinningCubeActor extends SceneActor<pc.Material> {
-  box?: pc.Entity;
-
   private readonly _cubeOpts = {
     halfExtents: new pc.Vec3(0.5, 0.1, 0.5),
     widthSegments: 2,
@@ -14,22 +12,24 @@ export class SpinningCubeActor extends SceneActor<pc.Material> {
 
   init(material: pc.Material): this {
     const app = this.scene.app;
-    this.box = new pc.Entity("cube");
+    const cube = new pc.Entity("cube");
 
     const mesh = pc.createBox(app.graphicsDevice, this._cubeOpts);
     const meshInstance = new pc.MeshInstance(mesh, material);
 
-    this.box.addComponent("render", {
+    cube.addComponent("render", {
       meshInstances: [meshInstance],
     });
-    this.parent.addChild(this.box);
+    this.parent.addChild(cube);
+    cube.setPosition(0, 0, 0);
 
+    this.entity = cube;
     return super.init(material);
   }
 
   update(dt: number): void {
-    if (this.box) {
-      this.box.rotate(1.0 * dt, 2.0 * dt, 3.0 * dt);
+    if (this.entity) {
+      this.entity.rotate(1.0 * dt, 2.0 * dt, 3.0 * dt);
     }
   }
 }
