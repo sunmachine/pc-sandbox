@@ -2,16 +2,17 @@ import { MOUSEBUTTON_LEFT, type HandleEventCallback } from "playcanvas";
 import type { CameraActor } from "../actors/CameraActor";
 import { SceneActor } from "../actors/SceneActor";
 
-export class CameraInput extends SceneActor {
+export class CameraInput extends SceneActor<CameraActor> {
   camera?: CameraActor;
 
   private readonly panSpeedScalar = 0.01;
 
-  init(): this {
+  init(camera?: CameraActor): this {
     const app = this.scene.app;
+    this.camera = camera;
 
     app.mouse.on("mousemove", this.onMouseMove());
-    return super.init();
+    return super.init(camera);
   }
 
   private onMouseMove(): HandleEventCallback {

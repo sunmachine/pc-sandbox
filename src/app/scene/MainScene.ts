@@ -19,7 +19,6 @@ export class MainScene extends Scene {
     new GroundPlaneActor(this, root).init(defaultMaterial);
 
     // Handle scene inputs.
-    const cameraInput = new CameraInput(this, root).init();
-    cameraInput.camera = camera;
+    new CameraInput(this, root).init(camera);
   }
 }
