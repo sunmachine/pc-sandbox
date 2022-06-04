@@ -20,7 +20,7 @@ export class CameraInput extends SceneActor<CameraActor> {
     { key: pc.KEY_D, direction: Direction.RIGHT },
     { key: pc.KEY_DOWN, direction: Direction.BACK },
     { key: pc.KEY_S, direction: Direction.BACK },
-    { key: pc.KEY_LEFT, direction: Direction.LEFT }, // Why is this triggering?! I am not touching this one!
+    { key: pc.KEY_LEFT, direction: Direction.LEFT },
     { key: pc.KEY_A, direction: Direction.LEFT },
     { key: pc.KEY_E, direction: Direction.UP },
     { key: pc.KEY_Q, direction: Direction.DOWN },
