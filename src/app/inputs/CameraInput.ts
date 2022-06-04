@@ -2,10 +2,12 @@ import * as pc from "playcanvas";
 import type { CameraActor } from "../actors/CameraActor";
 import { SceneActor } from "../actors/SceneActor";
 import { cartesianToSpherical } from "../math/SphericalCoords";
+import type { Vector3 } from "../math/Vectors";
 import { Direction, hasDirection } from "./Direction";
 
 export class CameraInput extends SceneActor<CameraActor> {
   camera?: CameraActor;
+  focus: Vector3 = new pc.Vec3();
 
   private readonly panSpeedScalar = 0.01;
   private readonly orbitSpeedScalar = 0.01;
@@ -35,9 +37,8 @@ export class CameraInput extends SceneActor<CameraActor> {
 
     app.mouse.on("mousemove", (e) => this.onMouseMove(e));
     app.mouse.on("mousewheel", (e) => this.onMouseWheel(e));
-    // TODO: Refactor to work with Orbit Cam.
-    // app.keyboard.on("keydown", (e) => this.onKeyDown(e));
-    // app.keyboard.on("keyup", (e) => this.onKeyUp(e));
+    app.keyboard.on("keydown", (e) => this.onKeyDown(e));
+    app.keyboard.on("keyup", (e) => this.onKeyUp(e));
 
     this.camera?.entity?.lookAt(pc.Vec3.ZERO);
 
@@ -46,18 +47,7 @@ export class CameraInput extends SceneActor<CameraActor> {
 
   update(dt: number) {
     if (this.isMoving) {
-      const pos = this.camera?.entity?.getPosition();
-      if (pos && this.currentMoveDir !== 0) {
-        const amount = dt * this.moveSpeedScalar;
-        pos.z -= amount * +hasDirection(this.currentMoveDir, Direction.FORWARD);
-        pos.x += amount * +hasDirection(this.currentMoveDir, Direction.RIGHT);
-        pos.z += amount * +hasDirection(this.currentMoveDir, Direction.BACK);
-        pos.x -= amount * +hasDirection(this.currentMoveDir, Direction.LEFT);
-        pos.y += amount * +hasDirection(this.currentMoveDir, Direction.UP);
-        pos.y -= amount * +hasDirection(this.currentMoveDir, Direction.DOWN);
-
-        this.camera?.entity?.setPosition(pos);
-      }
+      this.move(dt);
     }
   }
 
@@ -74,8 +64,7 @@ export class CameraInput extends SceneActor<CameraActor> {
   private onMouseMove(evt: pc.MouseEvent) {
     if (app.mouse.isPressed(pc.MOUSEBUTTON_LEFT)) {
       if (app.keyboard.isPressed(pc.KEY_SHIFT)) {
-        // TODO: Refactor to work with Orbit Cam.
-        // this.pan(evt);
+        this.pan(evt);
       } else {
         this.orbit(evt);
       }
@@ -118,6 +107,21 @@ export class CameraInput extends SceneActor<CameraActor> {
     }
   }
 
+  private move(dt: number) {
+    const pos = this.camera?.entity?.getPosition();
+    if (pos && this.currentMoveDir !== 0) {
+      const amount = dt * this.moveSpeedScalar;
+      pos.z -= amount * +hasDirection(this.currentMoveDir, Direction.FORWARD);
+      pos.x += amount * +hasDirection(this.currentMoveDir, Direction.RIGHT);
+      pos.z += amount * +hasDirection(this.currentMoveDir, Direction.BACK);
+      pos.x -= amount * +hasDirection(this.currentMoveDir, Direction.LEFT);
+      pos.y += amount * +hasDirection(this.currentMoveDir, Direction.UP);
+      pos.y -= amount * +hasDirection(this.currentMoveDir, Direction.DOWN);
+
+      this.camera?.entity?.setPosition(pos);
+    }
+  }
+
   private orbit(evt: pc.MouseEvent) {
     if (evt.dx && evt.dy) {
       const pos = this.camera?.entity?.getPosition();
@@ -132,6 +136,17 @@ export class CameraInput extends SceneActor<CameraActor> {
     }
   }
 
+  private pan(evt: pc.MouseEvent) {
+    if (evt.dx && evt.dy) {
+      const pos = this.camera?.entity?.getPosition();
+      if (pos) {
+        pos.x -= evt.dx * this.panSpeedScalar;
+        pos.y += evt.dy * this.panSpeedScalar;
+        this.camera?.entity?.setPosition(pos);
+      }
+    }
+  }
+
   private zoom(evt: pc.MouseEvent) {
     if (evt.wheelDelta) {
       const pos = this.camera?.entity?.getPosition();
@@ -141,17 +156,6 @@ export class CameraInput extends SceneActor<CameraActor> {
         scoords.toCartesian(pos);
         this.camera?.entity?.setPosition(pos);
         this.camera?.entity?.lookAt(pc.Vec3.ZERO);
-      }
-    }
-  }
-
-  private pan(evt: pc.MouseEvent) {
-    if (evt.dx && evt.dy) {
-      const pos = this.camera?.entity?.getPosition();
-      if (pos) {
-        pos.x -= evt.dx * this.panSpeedScalar;
-        pos.y += evt.dy * this.panSpeedScalar;
-        this.camera?.entity?.setPosition(pos);
       }
     }
   }
