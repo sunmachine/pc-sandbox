@@ -2,7 +2,7 @@ import * as pc from "playcanvas";
 import { MainScene } from "./scene/MainScene";
 
 export function runApp(canvas: Element) {
-  const app = new pc.Application(canvas, {
+  app = new pc.Application(canvas, {
     elementInput: new pc.ElementInput(canvas),
     mouse: new pc.Mouse(canvas),
     touch: "ontouchstart" in window ? new pc.TouchDevice(canvas) : undefined,
@@ -13,7 +13,7 @@ export function runApp(canvas: Element) {
   app.setCanvasResolution(pc.RESOLUTION_AUTO);
   window.addEventListener("resize", () => app.resizeCanvas());
 
-  const scene = new MainScene(app);
+  const scene = new MainScene();
   scene.init();
 
   app.start();

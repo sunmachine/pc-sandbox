@@ -10,7 +10,6 @@ export class GroundPlaneActor extends SceneActor<pc.Material> {
   };
 
   init(material: pc.Material): this {
-    const app = this.scene.app;
     const plane = new pc.Entity("plane");
 
     const mesh = pc.createPlane(app.graphicsDevice, this._planeOpts);

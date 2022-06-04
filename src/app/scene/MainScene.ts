@@ -9,7 +9,7 @@ import { Scene } from "./Scene";
 export class MainScene extends Scene {
   init() {
     // Dependencies
-    const root = this.app.root;
+    const root = app.root;
     const defaultMaterial = new pc.StandardMaterial();
 
     // Create base scene actors.

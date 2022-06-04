@@ -11,7 +11,7 @@ export abstract class SceneActor<TInit = undefined> {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   init(_?: TInit): this {
-    this.scene.app.on("update", (dt) => {
+    app.on("update", (dt) => {
       if (this.update !== undefined) {
         this.update(dt);
       }

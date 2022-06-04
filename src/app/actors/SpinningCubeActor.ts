@@ -11,7 +11,6 @@ export class SpinningCubeActor extends SceneActor<pc.Material> {
   };
 
   init(material: pc.Material): this {
-    const app = this.scene.app;
     const cube = new pc.Entity("cube");
 
     const mesh = pc.createBox(app.graphicsDevice, this._cubeOpts);

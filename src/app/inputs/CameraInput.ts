@@ -8,7 +8,6 @@ export class CameraInput extends SceneActor<CameraActor> {
   private readonly panSpeedScalar = 0.01;
 
   init(camera?: CameraActor): this {
-    const app = this.scene.app;
     this.camera = camera;
 
     app.mouse.on("mousemove", this.onMouseMove());
@@ -16,7 +15,6 @@ export class CameraInput extends SceneActor<CameraActor> {
   }
 
   private onMouseMove(): HandleEventCallback {
-    const app = this.scene.app;
     return (evt) => {
       if (app.mouse.isPressed(MOUSEBUTTON_LEFT)) {
         this.simplePan(evt.dx, evt.dy);
