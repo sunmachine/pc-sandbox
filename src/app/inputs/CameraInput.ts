@@ -46,6 +46,33 @@ export class CameraInput extends SceneActor<CameraActor> {
     return super.init(camera);
   }
 
+  update(dt: number) {
+    if (this.isMoving) {
+      const pos = this.camera?.entity?.getPosition();
+      if (pos && this.currentMoveDir !== 0) {
+        const amount = dt * this.moveSpeedScalar;
+        pos.z -= amount * +hasDirection(this.currentMoveDir, Direction.FORWARD);
+        pos.x -= amount * +hasDirection(this.currentMoveDir, Direction.RIGHT);
+        pos.z += amount * +hasDirection(this.currentMoveDir, Direction.BACK);
+        pos.x += amount * +hasDirection(this.currentMoveDir, Direction.LEFT);
+        pos.y += amount * +hasDirection(this.currentMoveDir, Direction.UP);
+        pos.y -= amount * +hasDirection(this.currentMoveDir, Direction.DOWN);
+
+        this.camera?.entity?.setPosition(pos);
+        console.log(this.currentMoveDir, prettyDirection(this.currentMoveDir));
+      }
+    }
+
+    if (this.isPanning) {
+      const pos = this.camera?.entity?.getPosition();
+      if (pos) {
+        pos.x -= this.currentPanDelta.dx * dt * this.panSpeedScalar;
+        pos.y += this.currentPanDelta.dy * dt * this.panSpeedScalar;
+        this.camera?.entity?.setPosition(pos);
+      }
+    }
+  }
+
   private onMouseMove(): pc.HandleEventCallback {
     return (evt) => {
       if (app.mouse.isPressed(pc.MOUSEBUTTON_LEFT)) {
@@ -104,32 +131,6 @@ export class CameraInput extends SceneActor<CameraActor> {
   private updateKeyInput(update: () => void) {
     if (this.currentMoveDir > Direction.NONE) {
       update();
-    }
-  }
-
-  update(dt: number) {
-    if (this.isMoving) {
-      const pos = this.camera?.entity?.getPosition();
-      if (pos) {
-        const amount = dt * this.moveSpeedScalar;
-        pos.z -= amount * +hasDirection(this.currentMoveDir, Direction.FORWARD);
-        pos.x -= amount * +hasDirection(this.currentMoveDir, Direction.RIGHT);
-        pos.z += amount * +hasDirection(this.currentMoveDir, Direction.BACK);
-        pos.x += amount * +hasDirection(this.currentMoveDir, Direction.LEFT);
-        pos.y += amount * +hasDirection(this.currentMoveDir, Direction.UP);
-        pos.y -= amount * +hasDirection(this.currentMoveDir, Direction.DOWN);
-
-        this.camera?.entity?.setPosition(pos);
-      }
-    }
-
-    if (this.isPanning) {
-      const pos = this.camera?.entity?.getPosition();
-      if (pos) {
-        pos.x -= this.currentPanDelta.dx * dt * this.panSpeedScalar;
-        pos.y += this.currentPanDelta.dy * dt * this.panSpeedScalar;
-        this.camera?.entity?.setPosition(pos);
-      }
     }
   }
 }
