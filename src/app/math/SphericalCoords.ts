@@ -41,7 +41,10 @@ export function sphericalToCartesian(
   return vec;
 }
 
-export function cartesianToSpherical(vec: Vector3): SphericalCoords {
+export function cartesianToSpherical(
+  vec: Vector3,
+  outCoords?: SphericalCoords
+): SphericalCoords {
   if (vec.x == 0) vec.x = Number.EPSILON;
 
   const radius = Math.sqrt(vec.x ** 2 + vec.y ** 2 + vec.z ** 2);
@@ -50,6 +53,13 @@ export function cartesianToSpherical(vec: Vector3): SphericalCoords {
   if (vec.x < 0) polar += Math.PI;
 
   const elevation = Math.asin(vec.y / radius);
+
+  if (outCoords) {
+    outCoords.elevation = elevation;
+    outCoords.polar = polar;
+    outCoords.radius = radius;
+    return outCoords;
+  }
 
   return new SphericalCoords(radius, polar, elevation);
 }
