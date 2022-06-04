@@ -12,7 +12,6 @@ export class CameraInput extends SceneActor<CameraActor> {
   private pressedKeys = new Set<number>();
 
   private isMoving = false;
-  private isPanning = false;
 
   private readonly keyMapping = [
     { key: pc.KEY_UP, direction: Direction.FORWARD },
@@ -57,7 +56,6 @@ export class CameraInput extends SceneActor<CameraActor> {
   private onMouseMove(): pc.HandleEventCallback {
     return (evt) => {
       if (app.mouse.isPressed(pc.MOUSEBUTTON_LEFT)) {
-        this.isPanning = true;
         if (evt.dx && evt.dy) {
           const pos = this.camera?.entity?.getPosition();
           if (pos) {
@@ -66,8 +64,6 @@ export class CameraInput extends SceneActor<CameraActor> {
             this.camera?.entity?.setPosition(pos);
           }
         }
-      } else {
-        this.isPanning = false;
       }
     };
   }
