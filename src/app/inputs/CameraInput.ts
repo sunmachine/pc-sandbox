@@ -44,9 +44,9 @@ export class CameraInput extends SceneActor<CameraActor> {
       if (pos && this.currentMoveDir !== 0) {
         const amount = dt * this.moveSpeedScalar;
         pos.z -= amount * +hasDirection(this.currentMoveDir, Direction.FORWARD);
-        pos.x -= amount * +hasDirection(this.currentMoveDir, Direction.RIGHT);
+        pos.x += amount * +hasDirection(this.currentMoveDir, Direction.RIGHT);
         pos.z += amount * +hasDirection(this.currentMoveDir, Direction.BACK);
-        pos.x += amount * +hasDirection(this.currentMoveDir, Direction.LEFT);
+        pos.x -= amount * +hasDirection(this.currentMoveDir, Direction.LEFT);
         pos.y += amount * +hasDirection(this.currentMoveDir, Direction.UP);
         pos.y -= amount * +hasDirection(this.currentMoveDir, Direction.DOWN);
 
