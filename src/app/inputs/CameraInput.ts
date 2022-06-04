@@ -1,15 +1,15 @@
 import * as pc from "playcanvas";
 import type { CameraActor } from "../actors/CameraActor";
 import { SceneActor } from "../actors/SceneActor";
-import { Direction, hasDirection, prettyDirection } from "./Direction";
+import { Direction, hasDirection } from "./Direction";
 
 export class CameraInput extends SceneActor<CameraActor> {
   camera?: CameraActor;
 
-  private readonly panSpeedScalar = 1;
+  private readonly panSpeedScalar = 0.01;
   private readonly moveSpeedScalar = 1;
   private currentMoveDir: Direction = Direction.NONE;
-  private currentPanDelta: { dx: number; dy: number } = { dx: 0, dy: 0 };
+  private pressedKeys = new Set<number>();
 
   private isMoving = false;
   private isPanning = false;
@@ -21,20 +21,11 @@ export class CameraInput extends SceneActor<CameraActor> {
     { key: pc.KEY_D, direction: Direction.RIGHT },
     { key: pc.KEY_DOWN, direction: Direction.BACK },
     { key: pc.KEY_S, direction: Direction.BACK },
-    { key: pc.KEY_LEFT, direction: Direction.LEFT },
+    { key: pc.KEY_LEFT, direction: Direction.LEFT }, // Why is this triggering?! I am not touching this one!
     { key: pc.KEY_A, direction: Direction.LEFT },
     { key: pc.KEY_E, direction: Direction.UP },
     { key: pc.KEY_Q, direction: Direction.DOWN },
   ];
-
-  private readonly axisMappings = {
-    [Direction.FORWARD]: Direction.BACK,
-    [Direction.BACK]: Direction.FORWARD,
-    [Direction.LEFT]: Direction.RIGHT,
-    [Direction.RIGHT]: Direction.LEFT,
-    [Direction.UP]: Direction.DOWN,
-    [Direction.DOWN]: Direction.UP,
-  };
 
   init(camera?: CameraActor): this {
     this.camera = camera;
@@ -59,16 +50,6 @@ export class CameraInput extends SceneActor<CameraActor> {
         pos.y -= amount * +hasDirection(this.currentMoveDir, Direction.DOWN);
 
         this.camera?.entity?.setPosition(pos);
-        console.log(this.currentMoveDir, prettyDirection(this.currentMoveDir));
-      }
-    }
-
-    if (this.isPanning) {
-      const pos = this.camera?.entity?.getPosition();
-      if (pos) {
-        pos.x -= this.currentPanDelta.dx * dt * this.panSpeedScalar;
-        pos.y += this.currentPanDelta.dy * dt * this.panSpeedScalar;
-        this.camera?.entity?.setPosition(pos);
       }
     }
   }
@@ -78,8 +59,12 @@ export class CameraInput extends SceneActor<CameraActor> {
       if (app.mouse.isPressed(pc.MOUSEBUTTON_LEFT)) {
         this.isPanning = true;
         if (evt.dx && evt.dy) {
-          this.currentPanDelta.dx = evt.dx;
-          this.currentPanDelta.dy = evt.dy;
+          const pos = this.camera?.entity?.getPosition();
+          if (pos) {
+            pos.x -= evt.dx * this.panSpeedScalar;
+            pos.y += evt.dy * this.panSpeedScalar;
+            this.camera?.entity?.setPosition(pos);
+          }
         }
       } else {
         this.isPanning = false;
@@ -92,21 +77,18 @@ export class CameraInput extends SceneActor<CameraActor> {
       this.keyMapping.forEach((map) => {
         if (
           app.keyboard.isPressed(map.key) &&
+          !this.pressedKeys.has(map.key) &&
           hasDirection(this.currentMoveDir, map.direction) === false
         ) {
-          const inverseDir = this.axisMappings[map.direction];
-          if (hasDirection(this.currentMoveDir, inverseDir)) {
-            this.currentMoveDir -= inverseDir;
-          }
-
+          this.pressedKeys.add(map.key);
           this.currentMoveDir += map.direction;
         }
       });
 
-      this.updateKeyInput(() => {
+      if (this.currentMoveDir > Direction.NONE && !this.isMoving) {
         this.isMoving = true;
         evt.event.preventDefault();
-      });
+      }
     };
   }
 
@@ -115,22 +97,18 @@ export class CameraInput extends SceneActor<CameraActor> {
       this.keyMapping.forEach((map) => {
         if (
           !app.keyboard.isPressed(map.key) &&
+          this.pressedKeys.has(map.key) &&
           hasDirection(this.currentMoveDir, map.direction)
         ) {
+          this.pressedKeys.delete(map.key);
           this.currentMoveDir -= map.direction;
         }
       });
 
-      this.updateKeyInput(() => {
+      if (this.currentMoveDir === Direction.NONE && this.isMoving) {
         this.isMoving = false;
         evt.event.preventDefault();
-      });
+      }
     };
-  }
-
-  private updateKeyInput(update: () => void) {
-    if (this.currentMoveDir > Direction.NONE) {
-      update();
-    }
   }
 }
