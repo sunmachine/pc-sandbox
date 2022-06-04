@@ -33,6 +33,8 @@ export class CameraInput extends SceneActor<CameraActor> {
     app.keyboard.on("keydown", this.onKeyDown());
     app.keyboard.on("keyup", this.onKeyUp());
 
+    this.camera?.entity?.lookAt(pc.Vec3.ZERO);
+
     return super.init(camera);
   }
 
