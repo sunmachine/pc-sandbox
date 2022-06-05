@@ -45,14 +45,15 @@ export function cartesianToSpherical(
   vec: Vector3,
   outCoords?: SphericalCoords
 ): SphericalCoords {
-  if (vec.x == 0) vec.x = Number.EPSILON;
+  const x = vec.x === 0 ? Number.EPSILON : vec.x;
+  const y = vec.y;
+  const z = vec.z;
 
-  const radius = Math.sqrt(vec.x ** 2 + vec.y ** 2 + vec.z ** 2);
+  const radius = Math.sqrt(x ** 2 + y ** 2 + z ** 2);
+  let polar = Math.atan(z / x);
+  if (x < 0) polar += Math.PI;
 
-  let polar = Math.atan(vec.z / vec.x);
-  if (vec.x < 0) polar += Math.PI;
-
-  const elevation = Math.asin(vec.y / radius);
+  const elevation = Math.asin(y / radius);
 
   if (outCoords) {
     outCoords.elevation = elevation;
