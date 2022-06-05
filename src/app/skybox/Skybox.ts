@@ -28,6 +28,8 @@ export class Skybox {
     return this.initFromTexture(t);
   }
 
+  // Just stole this from the viewer, since this is absolutely silly.
+  // https://github.com/playcanvas/model-viewer/blob/main/src/viewer.ts#L425
   private initFromTexture(env: pc.Texture) {
     const skybox = pc.EnvLighting.generateSkyboxCubemap(env);
     const lighting = pc.EnvLighting.generateLightingSource(env);
