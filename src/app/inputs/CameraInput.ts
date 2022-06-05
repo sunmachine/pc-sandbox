@@ -7,8 +7,10 @@ import { Direction, hasDirection } from "./Direction";
 
 export class CameraInput extends SceneActor<CameraActor> {
   camera?: CameraActor;
-  cameraPos: SphericalCoords = cartesianToSpherical(pc.Vec3.ZERO);
+  cameraCoords: SphericalCoords = cartesianToSpherical(pc.Vec3.ZERO);
   focus: Vector3 = new pc.Vec3();
+
+  private _camPosUpdate: Vector3 = new pc.Vec3();
 
   private readonly panSpeedScalar = 0.01;
   private readonly orbitSpeedScalar = 0.01;
@@ -41,7 +43,8 @@ export class CameraInput extends SceneActor<CameraActor> {
     app.keyboard.on("keydown", (e) => this.onKeyDown(e));
     app.keyboard.on("keyup", (e) => this.onKeyUp(e));
 
-    this.camera?.entity?.lookAt(pc.Vec3.ZERO);
+    cartesianToSpherical(new pc.Vec3(0, 1, 3), this.cameraCoords);
+    this.updateCameraFocus();
 
     return super.init(camera);
   }
@@ -49,6 +52,14 @@ export class CameraInput extends SceneActor<CameraActor> {
   update(dt: number) {
     if (this.isMoving) {
       this.move(dt);
+    }
+  }
+
+  private updateCameraFocus() {
+    if (this.camera?.entity) {
+      this.cameraCoords.toCartesian(this._camPosUpdate).add(this.focus);
+      this.camera.entity.setPosition(this._camPosUpdate);
+      this.camera.entity.lookAt(this.focus);
     }
   }
 
@@ -109,58 +120,39 @@ export class CameraInput extends SceneActor<CameraActor> {
   }
 
   private move(dt: number) {
-    const pos = this.camera?.entity?.getPosition();
-    if (pos && this.currentMoveDir !== 0) {
-      const amount = dt * this.moveSpeedScalar;
-      pos.z -= amount * +hasDirection(this.currentMoveDir, Direction.FORWARD);
-      pos.x += amount * +hasDirection(this.currentMoveDir, Direction.RIGHT);
-      pos.z += amount * +hasDirection(this.currentMoveDir, Direction.BACK);
-      pos.x -= amount * +hasDirection(this.currentMoveDir, Direction.LEFT);
-      pos.y += amount * +hasDirection(this.currentMoveDir, Direction.UP);
-      pos.y -= amount * +hasDirection(this.currentMoveDir, Direction.DOWN);
+    if (this.currentMoveDir !== 0) {
+      const d = dt * this.moveSpeedScalar;
+      this.focus.z -= d * +hasDirection(this.currentMoveDir, Direction.FORWARD);
+      this.focus.x += d * +hasDirection(this.currentMoveDir, Direction.RIGHT);
+      this.focus.z += d * +hasDirection(this.currentMoveDir, Direction.BACK);
+      this.focus.x -= d * +hasDirection(this.currentMoveDir, Direction.LEFT);
+      this.focus.y += d * +hasDirection(this.currentMoveDir, Direction.UP);
+      this.focus.y -= d * +hasDirection(this.currentMoveDir, Direction.DOWN);
 
-      this.camera?.entity?.setPosition(pos);
+      this.updateCameraFocus();
     }
   }
 
-  // TODO: Store camera position as a spherical coordinate.
-  //        Update camera position by offsetting the sphereical coordinate
-  //        by the focus position Vector3.
   private orbit(evt: pc.MouseEvent) {
     if (evt.dx && evt.dy) {
-      const pos = this.camera?.entity?.getPosition();
-      if (pos) {
-        const scoords = cartesianToSpherical(pos);
-        scoords.polar += evt.dx * this.orbitSpeedScalar;
-        scoords.elevation += evt.dy * this.orbitSpeedScalar;
-        scoords.toCartesian(pos);
-        this.camera?.entity?.setPosition(pos);
-        this.camera?.entity?.lookAt(pc.Vec3.ZERO);
-      }
+      this.cameraCoords.polar += evt.dx * this.orbitSpeedScalar;
+      this.cameraCoords.elevation += evt.dy * this.orbitSpeedScalar;
+      this.updateCameraFocus();
     }
   }
 
   private pan(evt: pc.MouseEvent) {
     if (evt.dx && evt.dy) {
-      const pos = this.camera?.entity?.getPosition();
-      if (pos) {
-        pos.x -= evt.dx * this.panSpeedScalar;
-        pos.y += evt.dy * this.panSpeedScalar;
-        this.camera?.entity?.setPosition(pos);
-      }
+      this.focus.x -= evt.dx * this.panSpeedScalar;
+      this.focus.y += evt.dy * this.panSpeedScalar;
+      this.updateCameraFocus();
     }
   }
 
   private zoom(evt: pc.MouseEvent) {
     if (evt.wheelDelta) {
-      const pos = this.camera?.entity?.getPosition();
-      if (pos) {
-        const scoords = cartesianToSpherical(pos);
-        scoords.radius += evt.wheelDelta * this.zoomSpeedScalar;
-        scoords.toCartesian(pos);
-        this.camera?.entity?.setPosition(pos);
-        this.camera?.entity?.lookAt(pc.Vec3.ZERO);
-      }
+      this.cameraCoords.radius += evt.wheelDelta * this.zoomSpeedScalar;
+      this.updateCameraFocus();
     }
   }
 }
