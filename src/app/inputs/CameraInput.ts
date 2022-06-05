@@ -119,15 +119,27 @@ export class CameraInput extends SceneActor<CameraActor> {
 
   private move(dt: number) {
     if (this._moveDir !== 0) {
-      const d = dt * this.moveSpeedScalar;
-      this.focus.z -= d * +hasDirection(this._moveDir, Direction.FORWARD);
-      this.focus.x += d * +hasDirection(this._moveDir, Direction.RIGHT);
-      this.focus.z += d * +hasDirection(this._moveDir, Direction.BACK);
-      this.focus.x -= d * +hasDirection(this._moveDir, Direction.LEFT);
-      this.focus.y += d * +hasDirection(this._moveDir, Direction.UP);
-      this.focus.y -= d * +hasDirection(this._moveDir, Direction.DOWN);
+      const transform = this.camera?.entity;
 
-      this.updateCameraFocus();
+      if (transform) {
+        const scaleBy = (vec: Vector3, n: Direction, p: Direction) => {
+          return this._camPosUpdate
+            .copy(vec)
+            .mulScalar(
+              dt *
+                this.moveSpeedScalar *
+                (-1 * +hasDirection(this._moveDir, n) +
+                  1 * +hasDirection(this._moveDir, p))
+            );
+        };
+
+        this.focus
+          .add(scaleBy(transform.forward, Direction.BACK, Direction.FORWARD))
+          .add(scaleBy(transform.right, Direction.LEFT, Direction.RIGHT))
+          .add(scaleBy(transform.up, Direction.DOWN, Direction.UP));
+
+        this.updateCameraFocus();
+      }
     }
   }
 
