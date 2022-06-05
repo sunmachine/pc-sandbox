@@ -11,16 +11,14 @@ export class CameraInput extends SceneActor<CameraActor> {
   focus: Vector3 = new pc.Vec3();
 
   private _camPosUpdate: Vector3 = new pc.Vec3();
+  private _moveDir: Direction = Direction.NONE;
+  private _pressedKeys = new Set<number>();
+  private _isMoving = false;
 
   private readonly panSpeedScalar = 0.01;
   private readonly orbitSpeedScalar = 0.01;
   private readonly moveSpeedScalar = 1;
   private readonly zoomSpeedScalar = 0.1;
-
-  private currentMoveDir: Direction = Direction.NONE;
-  private pressedKeys = new Set<number>();
-
-  private isMoving = false;
 
   private readonly keyMapping = [
     { key: pc.KEY_UP, direction: Direction.FORWARD },
@@ -50,7 +48,7 @@ export class CameraInput extends SceneActor<CameraActor> {
   }
 
   update(dt: number) {
-    if (this.isMoving) {
+    if (this._isMoving) {
       this.move(dt);
     }
   }
@@ -87,16 +85,16 @@ export class CameraInput extends SceneActor<CameraActor> {
     this.keyMapping.forEach((map) => {
       if (
         app.keyboard.isPressed(map.key) &&
-        !this.pressedKeys.has(map.key) &&
-        hasDirection(this.currentMoveDir, map.direction) === false
+        !this._pressedKeys.has(map.key) &&
+        hasDirection(this._moveDir, map.direction) === false
       ) {
-        this.pressedKeys.add(map.key);
-        this.currentMoveDir += map.direction;
+        this._pressedKeys.add(map.key);
+        this._moveDir += map.direction;
       }
     });
 
-    if (this.currentMoveDir > Direction.NONE && !this.isMoving) {
-      this.isMoving = true;
+    if (this._moveDir > Direction.NONE && !this._isMoving) {
+      this._isMoving = true;
       evt.event.preventDefault();
     }
   }
@@ -105,29 +103,29 @@ export class CameraInput extends SceneActor<CameraActor> {
     this.keyMapping.forEach((map) => {
       if (
         !app.keyboard.isPressed(map.key) &&
-        this.pressedKeys.has(map.key) &&
-        hasDirection(this.currentMoveDir, map.direction)
+        this._pressedKeys.has(map.key) &&
+        hasDirection(this._moveDir, map.direction)
       ) {
-        this.pressedKeys.delete(map.key);
-        this.currentMoveDir -= map.direction;
+        this._pressedKeys.delete(map.key);
+        this._moveDir -= map.direction;
       }
     });
 
-    if (this.currentMoveDir === Direction.NONE && this.isMoving) {
-      this.isMoving = false;
+    if (this._moveDir === Direction.NONE && this._isMoving) {
+      this._isMoving = false;
       evt.event.preventDefault();
     }
   }
 
   private move(dt: number) {
-    if (this.currentMoveDir !== 0) {
+    if (this._moveDir !== 0) {
       const d = dt * this.moveSpeedScalar;
-      this.focus.z -= d * +hasDirection(this.currentMoveDir, Direction.FORWARD);
-      this.focus.x += d * +hasDirection(this.currentMoveDir, Direction.RIGHT);
-      this.focus.z += d * +hasDirection(this.currentMoveDir, Direction.BACK);
-      this.focus.x -= d * +hasDirection(this.currentMoveDir, Direction.LEFT);
-      this.focus.y += d * +hasDirection(this.currentMoveDir, Direction.UP);
-      this.focus.y -= d * +hasDirection(this.currentMoveDir, Direction.DOWN);
+      this.focus.z -= d * +hasDirection(this._moveDir, Direction.FORWARD);
+      this.focus.x += d * +hasDirection(this._moveDir, Direction.RIGHT);
+      this.focus.z += d * +hasDirection(this._moveDir, Direction.BACK);
+      this.focus.x -= d * +hasDirection(this._moveDir, Direction.LEFT);
+      this.focus.y += d * +hasDirection(this._moveDir, Direction.UP);
+      this.focus.y -= d * +hasDirection(this._moveDir, Direction.DOWN);
 
       this.updateCameraFocus();
     }
