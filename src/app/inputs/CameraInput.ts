@@ -1,12 +1,13 @@
 import * as pc from "playcanvas";
 import type { CameraActor } from "../actors/CameraActor";
 import { SceneActor } from "../actors/SceneActor";
-import { cartesianToSpherical } from "../math/SphericalCoords";
+import { cartesianToSpherical, SphericalCoords } from "../math/SphericalCoords";
 import type { Vector3 } from "../math/Vectors";
 import { Direction, hasDirection } from "./Direction";
 
 export class CameraInput extends SceneActor<CameraActor> {
   camera?: CameraActor;
+  cameraPos: SphericalCoords = cartesianToSpherical(pc.Vec3.ZERO);
   focus: Vector3 = new pc.Vec3();
 
   private readonly panSpeedScalar = 0.01;
@@ -122,6 +123,9 @@ export class CameraInput extends SceneActor<CameraActor> {
     }
   }
 
+  // TODO: Store camera position as a spherical coordinate.
+  //        Update camera position by offsetting the sphereical coordinate
+  //        by the focus position Vector3.
   private orbit(evt: pc.MouseEvent) {
     if (evt.dx && evt.dy) {
       const pos = this.camera?.entity?.getPosition();
