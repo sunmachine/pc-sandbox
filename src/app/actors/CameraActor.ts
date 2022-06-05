@@ -5,7 +5,7 @@ export class CameraActor extends SceneActor {
   init(): this {
     const camera = new pc.Entity("camera");
     camera.addComponent("camera", {
-      clearColor: new pc.Color(0.1, 0.1, 0.1),
+      clearColor: new pc.Color(0.15, 0.15, 0.15),
     });
 
     this.parent?.addChild(camera);

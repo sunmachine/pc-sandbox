@@ -13,8 +13,6 @@ export function runApp(canvas: Element) {
   app.setCanvasResolution(pc.RESOLUTION_AUTO);
   window.addEventListener("resize", () => app.resizeCanvas());
 
-  const scene = new MainScene();
-  scene.init();
-
+  new MainScene(app.scene).init();
   app.start();
 }
