@@ -1,10 +1,13 @@
 <script setup lang="ts">
-import { runApp } from "@/app/runApp";
+import { Viewer } from "@/app/Viewer";
 import { ref, onMounted } from "vue";
 
 const application = ref(null);
+
 onMounted(() => {
-  runApp(application.value as unknown as Element);
+  const canvas = application.value as unknown as Element;
+  const viewer = new Viewer(canvas);
+  viewer.start();
 });
 </script>
 
