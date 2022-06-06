@@ -1,7 +1,7 @@
 import * as pc from "playcanvas";
 import { CameraActor } from "./actors/CameraActor";
 import { LightActor } from "./actors/LightActor";
-import type { SceneActor } from "./actors/SceneActor";
+import type { Actor } from "./actors/Actor";
 import { SpinningCubeActor } from "./actors/SpinningCubeActor";
 import { CameraInput } from "./inputs/CameraInput";
 import { Skybox } from "./skybox/Skybox";
@@ -12,7 +12,7 @@ export class Viewer {
     return Viewer.#app;
   }
 
-  protected actors: Array<SceneActor> = [];
+  protected actors: Array<Actor> = [];
 
   constructor(canvas: Element) {
     Viewer.#app = this.setupApp(canvas);

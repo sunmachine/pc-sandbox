@@ -1,14 +1,14 @@
 import * as pc from "playcanvas";
-import { SceneActor } from "./SceneActor";
+import { Actor } from "./Actor";
 
-export class CameraActor extends SceneActor {
+export class CameraActor extends Actor {
   init(): this {
     const camera = new pc.Entity("camera");
     camera.addComponent("camera", {
       clearColor: new pc.Color(0.15, 0.15, 0.15),
     });
 
-    this.parent?.addChild(camera);
+    this.root?.addChild(camera);
 
     this.entity = camera;
     return super.init();

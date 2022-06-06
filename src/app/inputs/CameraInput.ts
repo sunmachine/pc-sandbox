@@ -1,12 +1,12 @@
 import * as pc from "playcanvas";
 import type { CameraActor } from "../actors/CameraActor";
-import { SceneActor } from "../actors/SceneActor";
+import { Actor } from "../actors/Actor";
 import { cartesianToSpherical, SphericalCoords } from "../math/SphericalCoords";
 import type { Vector3 } from "../math/Vectors";
 import { Viewer } from "../Viewer";
 import { Direction, hasDirection } from "./Direction";
 
-export class CameraInput extends SceneActor<CameraActor> {
+export class CameraInput extends Actor<CameraActor> {
   camera?: CameraActor;
   cameraCoords: SphericalCoords = cartesianToSpherical(pc.Vec3.ZERO);
   focus: Vector3 = new pc.Vec3();

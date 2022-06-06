@@ -1,11 +1,11 @@
 import * as pc from "playcanvas";
-import { SceneActor } from "./SceneActor";
+import { Actor } from "./Actor";
 
-export class LightActor extends SceneActor {
+export class LightActor extends Actor {
   init(): this {
     const light = new pc.Entity("light");
     light.addComponent("light");
-    this.parent?.addChild(light);
+    this.root?.addChild(light);
     light.setEulerAngles(45, 0, 0);
 
     this.entity = light;
