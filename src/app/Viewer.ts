@@ -3,7 +3,6 @@ import { Camera } from "./actors/Camera";
 import { LightActor } from "./actors/LightActor";
 import type { Actor } from "./actors/Actor";
 import { SpinningCubeActor } from "./actors/SpinningCubeActor";
-import { CameraInput } from "./inputs/CameraInput";
 import { Skybox } from "./skybox/Skybox";
 
 export class Viewer {
@@ -47,12 +46,9 @@ export class Viewer {
     Viewer.app.scene.skybox = skybox;
     Viewer.app.scene.envAtlas = envAtlas;
 
-    // Create base scene actors.
-    const camera = new Camera(root);
+    // Create base actors.
+    new Camera(root);
     new LightActor(root);
     new SpinningCubeActor(root, defaultMaterial);
-
-    // Handle scene inputs.
-    new CameraInput(root, camera);
   }
 }
