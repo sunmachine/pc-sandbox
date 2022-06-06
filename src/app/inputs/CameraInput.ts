@@ -3,6 +3,7 @@ import type { CameraActor } from "../actors/CameraActor";
 import { SceneActor } from "../actors/SceneActor";
 import { cartesianToSpherical, SphericalCoords } from "../math/SphericalCoords";
 import type { Vector3 } from "../math/Vectors";
+import { Viewer } from "../Viewer";
 import { Direction, hasDirection } from "./Direction";
 
 export class CameraInput extends SceneActor<CameraActor> {
@@ -36,10 +37,10 @@ export class CameraInput extends SceneActor<CameraActor> {
   init(camera?: CameraActor): this {
     this.camera = camera;
 
-    app.mouse.on("mousemove", (e) => this.onMouseMove(e));
-    app.mouse.on("mousewheel", (e) => this.onMouseWheel(e));
-    app.keyboard.on("keydown", (e) => this.onKeyDown(e));
-    app.keyboard.on("keyup", (e) => this.onKeyUp(e));
+    Viewer.app.mouse.on("mousemove", (e) => this.onMouseMove(e));
+    Viewer.app.mouse.on("mousewheel", (e) => this.onMouseWheel(e));
+    Viewer.app.keyboard.on("keydown", (e) => this.onKeyDown(e));
+    Viewer.app.keyboard.on("keyup", (e) => this.onKeyUp(e));
 
     cartesianToSpherical(new pc.Vec3(0, 1, 3), this.cameraCoords);
     this.updateCameraFocus();
@@ -72,8 +73,8 @@ export class CameraInput extends SceneActor<CameraActor> {
   }
 
   private onMouseMove(evt: pc.MouseEvent) {
-    if (app.mouse.isPressed(pc.MOUSEBUTTON_LEFT)) {
-      if (app.keyboard.isPressed(pc.KEY_SHIFT)) {
+    if (Viewer.app.mouse.isPressed(pc.MOUSEBUTTON_LEFT)) {
+      if (Viewer.app.keyboard.isPressed(pc.KEY_SHIFT)) {
         this.pan(evt);
       } else {
         this.orbit(evt);
@@ -84,7 +85,7 @@ export class CameraInput extends SceneActor<CameraActor> {
   private onKeyDown(evt: pc.KeyboardEvent) {
     this.keyMapping.forEach((map) => {
       if (
-        app.keyboard.isPressed(map.key) &&
+        Viewer.app.keyboard.isPressed(map.key) &&
         !this._pressedKeys.has(map.key) &&
         hasDirection(this._moveDir, map.direction) === false
       ) {
@@ -102,7 +103,7 @@ export class CameraInput extends SceneActor<CameraActor> {
   private onKeyUp(evt: pc.KeyboardEvent) {
     this.keyMapping.forEach((map) => {
       if (
-        !app.keyboard.isPressed(map.key) &&
+        !Viewer.app.keyboard.isPressed(map.key) &&
         this._pressedKeys.has(map.key) &&
         hasDirection(this._moveDir, map.direction)
       ) {

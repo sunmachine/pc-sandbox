@@ -1,3 +1,4 @@
+import { Viewer } from "../Viewer";
 import type { Actor } from "./Actor";
 
 export interface SceneActor<TInit = undefined> extends Actor {
@@ -10,7 +11,7 @@ export abstract class SceneActor<TInit = undefined> {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   init(_?: TInit): this {
-    app.on("update", (dt) => {
+    Viewer.app.on("update", (dt) => {
       if (this.update !== undefined) {
         this.update(dt);
       }
