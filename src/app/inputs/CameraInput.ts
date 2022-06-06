@@ -6,8 +6,8 @@ import type { Vector3 } from "../math/Vectors";
 import { Viewer } from "../Viewer";
 import { Direction, hasDirection } from "./Direction";
 
-export class CameraInput extends Actor<Camera> {
-  camera?: Camera;
+export class CameraInput extends Actor {
+  camera: Camera;
   cameraCoords: SphericalCoords = cartesianToSpherical(pc.Vec3.ZERO);
   focus: Vector3 = new pc.Vec3();
 
@@ -34,8 +34,11 @@ export class CameraInput extends Actor<Camera> {
     { key: pc.KEY_Q, direction: Direction.DOWN },
   ];
 
-  init(camera?: Camera): this {
+  constructor(root: pc.Entity, camera: Camera) {
+    super(root);
+
     this.camera = camera;
+    this.entity = camera?.entity;
 
     Viewer.app.mouse.on("mousemove", (e) => this.onMouseMove(e));
     Viewer.app.mouse.on("mousewheel", (e) => this.onMouseWheel(e));
@@ -44,8 +47,6 @@ export class CameraInput extends Actor<Camera> {
 
     cartesianToSpherical(new pc.Vec3(0, 1, 3), this.cameraCoords);
     this.updateCameraFocus();
-
-    return super.init(camera);
   }
 
   update(dt: number) {

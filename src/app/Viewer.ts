@@ -48,11 +48,11 @@ export class Viewer {
     Viewer.app.scene.envAtlas = envAtlas;
 
     // Create base scene actors.
-    const camera = new Camera(root).init();
-    new LightActor(root).init();
-    new SpinningCubeActor(root).init(defaultMaterial);
+    const camera = new Camera(root);
+    new LightActor(root);
+    new SpinningCubeActor(root, defaultMaterial);
 
     // Handle scene inputs.
-    new CameraInput(root).init(camera);
+    new CameraInput(root, camera);
   }
 }
