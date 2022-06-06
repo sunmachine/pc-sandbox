@@ -1,5 +1,5 @@
 import * as pc from "playcanvas";
-import { CameraActor } from "./actors/CameraActor";
+import { Camera } from "./actors/Camera";
 import { LightActor } from "./actors/LightActor";
 import type { Actor } from "./actors/Actor";
 import { SpinningCubeActor } from "./actors/SpinningCubeActor";
@@ -48,7 +48,7 @@ export class Viewer {
     Viewer.app.scene.envAtlas = envAtlas;
 
     // Create base scene actors.
-    const camera = new CameraActor(root).init();
+    const camera = new Camera(root).init();
     new LightActor(root).init();
     new SpinningCubeActor(root).init(defaultMaterial);
 

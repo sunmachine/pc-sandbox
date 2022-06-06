@@ -1,13 +1,13 @@
 import * as pc from "playcanvas";
-import type { CameraActor } from "../actors/CameraActor";
+import type { Camera } from "../actors/Camera";
 import { Actor } from "../actors/Actor";
 import { cartesianToSpherical, SphericalCoords } from "../math/SphericalCoords";
 import type { Vector3 } from "../math/Vectors";
 import { Viewer } from "../Viewer";
 import { Direction, hasDirection } from "./Direction";
 
-export class CameraInput extends Actor<CameraActor> {
-  camera?: CameraActor;
+export class CameraInput extends Actor<Camera> {
+  camera?: Camera;
   cameraCoords: SphericalCoords = cartesianToSpherical(pc.Vec3.ZERO);
   focus: Vector3 = new pc.Vec3();
 
@@ -34,7 +34,7 @@ export class CameraInput extends Actor<CameraActor> {
     { key: pc.KEY_Q, direction: Direction.DOWN },
   ];
 
-  init(camera?: CameraActor): this {
+  init(camera?: Camera): this {
     this.camera = camera;
 
     Viewer.app.mouse.on("mousemove", (e) => this.onMouseMove(e));
