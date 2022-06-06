@@ -2,7 +2,7 @@ import * as pc from "playcanvas";
 import { Viewer } from "../Viewer";
 import { Actor } from "./Actor";
 
-export class SpinningCubeActor extends Actor {
+export class SpinningCube extends Actor {
   private readonly _cubeOpts = {
     halfExtents: new pc.Vec3(0.5, 0.1, 0.5),
     widthSegments: 2,

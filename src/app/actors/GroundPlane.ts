@@ -2,7 +2,7 @@ import * as pc from "playcanvas";
 import { Viewer } from "../Viewer";
 import { Actor } from "./Actor";
 
-export class GroundPlaneActor extends Actor {
+export class GroundPlane extends Actor {
   private readonly _planeOpts = {
     halfExtents: new pc.Vec2(4.0, 4.0),
     widthSegments: 8,

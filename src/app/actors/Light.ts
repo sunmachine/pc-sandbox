@@ -1,7 +1,7 @@
 import * as pc from "playcanvas";
 import { Actor } from "./Actor";
 
-export class LightActor extends Actor {
+export class Light extends Actor {
   constructor(root: pc.Entity) {
     super(root);
 
