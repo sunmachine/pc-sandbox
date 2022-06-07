@@ -1,7 +1,6 @@
 import * as pc from "playcanvas";
 import { Camera } from "./actors/Camera";
 import { Light } from "./actors/Light";
-import type { Actor } from "./actors/Actor";
 import { SpinningCube } from "./actors/SpinningCube";
 import { Skybox } from "./skybox/Skybox";
 
@@ -11,30 +10,26 @@ export class Viewer {
     return Viewer.#app;
   }
 
-  protected actors: Array<Actor> = [];
-
   constructor(canvas: Element) {
-    Viewer.#app = this.setupApp(canvas);
+    this.setupApp(canvas);
     this.setupScene();
   }
 
   start(): void {
-    Viewer.app.start();
+    Viewer.#app.start();
   }
 
-  private setupApp(canvas: Element): pc.Application {
-    const app = new pc.Application(canvas, {
+  private setupApp(canvas: Element) {
+    Viewer.#app = new pc.Application(canvas, {
       elementInput: new pc.ElementInput(canvas),
       mouse: new pc.Mouse(canvas),
       touch: "ontouchstart" in window ? new pc.TouchDevice(canvas) : undefined,
       keyboard: new pc.Keyboard(window),
     });
 
-    app.setCanvasFillMode(pc.FILLMODE_FILL_WINDOW);
-    app.setCanvasResolution(pc.RESOLUTION_AUTO);
-    window.addEventListener("resize", () => app.resizeCanvas());
-
-    return app;
+    Viewer.#app.setCanvasFillMode(pc.FILLMODE_FILL_WINDOW);
+    Viewer.#app.setCanvasResolution(pc.RESOLUTION_AUTO);
+    window.addEventListener("resize", () => Viewer.#app.resizeCanvas());
   }
 
   private setupScene() {
