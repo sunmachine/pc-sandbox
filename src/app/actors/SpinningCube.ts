@@ -21,7 +21,7 @@ export class SpinningCube extends Actor {
     cube.addComponent("render", {
       meshInstances: [meshInstance],
     });
-    this.root?.addChild(cube);
+    this.root.addChild(cube);
     cube.setPosition(0, 0, 0);
 
     this.entity = cube;

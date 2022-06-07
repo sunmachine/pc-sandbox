@@ -7,7 +7,7 @@ export class Light extends Actor {
 
     const light = new pc.Entity("light");
     light.addComponent("light");
-    this.root?.addChild(light);
+    this.root.addChild(light);
     light.setEulerAngles(45, 0, 0);
 
     this.entity = light;
