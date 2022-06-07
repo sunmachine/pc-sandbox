@@ -1,5 +1,5 @@
 import * as pc from "playcanvas";
-import { Gradient } from "../math/Color";
+import { Gradient } from "../types/Color";
 import { Viewer } from "../Viewer";
 
 type SkyboxTextures = { envAtlas: pc.Texture; skybox: pc.Texture };

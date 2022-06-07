@@ -8,7 +8,7 @@ export enum Direction {
   DOWN = 1 << 5,
 }
 
-export function prettyDirection(direction: Direction): string {
+export function getPrettyDirection(direction: Direction): string {
   const count = Object.entries(Direction).length / 2;
   const directions: Array<string> = [];
   for (let i = 0; i < count; i++) {
