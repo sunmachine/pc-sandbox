@@ -11,9 +11,8 @@ export class Skybox {
   // Sampled colors from this lovely screenshot:
   // https://github.com/danielshervheim/unity-stylized-sky
   private readonly gradient = new Gradient([
-    { index: 0.0, color: 0x667380 },
-    { index: 0.5, color: 0xcddfda },
-    { index: 1.0, color: 0x1d2f3b },
+    { index: 0.0, color: 0x121223 },
+    { index: 1.0, color: 0x897c7c },
   ]);
 
   generate(): SkyboxTextures {
