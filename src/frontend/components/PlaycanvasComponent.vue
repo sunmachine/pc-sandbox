@@ -12,5 +12,7 @@ onMounted(() => {
 </script>
 
 <template>
+  <!-- <v-container> -->
   <canvas ref="application" id="playcanvas" />
+  <!-- </v-container> -->
 </template>

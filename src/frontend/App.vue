@@ -3,9 +3,11 @@ import PlaycanvasComponent from "./components/PlaycanvasComponent.vue";
 </script>
 
 <template>
-  <main>
-    <PlaycanvasComponent />
-  </main>
+  <v-app>
+    <v-main>
+      <PlaycanvasComponent />
+    </v-main>
+  </v-app>
 </template>
 
 <style>
