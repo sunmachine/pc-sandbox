@@ -2,6 +2,8 @@ import * as pc from "playcanvas";
 import { Gradient } from "../math/Color";
 import { Viewer } from "../Viewer";
 
+type SkyboxTextures = { envAtlas: pc.Texture; skybox: pc.Texture };
+
 export class Skybox {
   private readonly x = 1024;
   private readonly y = 1024;
@@ -14,7 +16,7 @@ export class Skybox {
     { index: 1.0, color: 0x1d2f3b },
   ]);
 
-  generate(): { envAtlas: pc.Texture; skybox: pc.Texture } {
+  generate(): SkyboxTextures {
     const t = new pc.Texture(Viewer.app.graphicsDevice, {
       format: pc.PIXELFORMAT_R8_G8_B8,
       width: this.x,
@@ -44,7 +46,7 @@ export class Skybox {
   // Just stole this from the viewer, since this is absolutely silly.
   // https://github.com/playcanvas/model-viewer/blob/main/src/viewer.ts#L425
   #atlasOpts = {};
-  private initFromTexture(env: pc.Texture) {
+  private initFromTexture(env: pc.Texture): SkyboxTextures {
     const skybox = pc.EnvLighting.generateSkyboxCubemap(env);
     const lighting = pc.EnvLighting.generateLightingSource(env);
 
