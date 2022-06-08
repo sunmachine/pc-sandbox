@@ -11,7 +11,7 @@ import PlaycanvasComponent from "./components/PlaycanvasComponent.vue";
 </template>
 
 <style>
-@import "./assets/base.css";
+@import "./styles/base.css";
 
 #app {
   font-weight: normal;
