@@ -1,5 +1,6 @@
 import * as pc from "playcanvas";
 import { Camera } from "./actors/Camera";
+import { Grid } from "./actors/Grid";
 import { Light } from "./actors/Light";
 import { SpinningCube } from "./actors/SpinningCube";
 import { Skybox } from "./skybox/Skybox";
@@ -44,6 +45,7 @@ export class Viewer {
     // Create base actors.
     new Camera(root);
     new Light(root);
+    new Grid(root);
     new SpinningCube(root, defaultMaterial);
   }
 }
