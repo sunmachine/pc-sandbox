@@ -60,6 +60,11 @@ export class Camera extends Actor {
     }
   }
 
+  focusOnEntity(target: pc.Entity) {
+    this.focus.copy(target.getPosition());
+    this.updateCameraFocus();
+  }
+
   private updateCameraFocus() {
     this.cameraCoords.toCartesian(this._camPosUpdate).add(this.focus);
     this.entity.setPosition(this._camPosUpdate);

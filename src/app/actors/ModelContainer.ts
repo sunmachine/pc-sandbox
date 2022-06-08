@@ -8,9 +8,9 @@ export class ModelContainer extends Actor {
     super(root);
   }
 
-  loadGltf(file: File): pc.Asset {
+  loadGltf(file: File, callback?: (entity: pc.Entity) => void): pc.Asset {
     const asset = new pc.Asset(file.filename, "container", file);
-    asset.once("load", (asset) => this.onLoad(asset));
+    asset.once("load", (asset) => this.onLoad(asset, callback));
 
     Viewer.app.assets.add(asset);
     Viewer.app.assets.load(asset);
@@ -18,8 +18,19 @@ export class ModelContainer extends Actor {
     return asset;
   }
 
-  private onLoad(asset: pc.Asset) {
-    const renderRootEntity = asset.resource.instantiateRenderEntity();
-    this.root.addChild(renderRootEntity);
+  private onLoad(asset: pc.Asset, callback?: (entity: pc.Entity) => void) {
+    const entity: pc.Entity = asset.resource.instantiateRenderEntity();
+    this.centerToTop(entity);
+    this.root.addChild(entity);
+
+    if (callback) callback(entity);
+  }
+
+  private centerToTop(entity: pc.Entity) {
+    const aabb: pc.BoundingBox = entity.render?.meshInstances[0].aabb;
+    const min = aabb.getMin();
+    const pos = entity.getLocalPosition();
+    pos.y -= min.y;
+    entity.setPosition(pos);
   }
 }

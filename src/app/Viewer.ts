@@ -42,7 +42,7 @@ export class Viewer {
     Viewer.app.scene.envAtlas = envAtlas;
 
     // Create base actors.
-    new Camera(root);
+    const camera = new Camera(root);
     new Light(root);
     new Grid(root);
 
@@ -51,6 +51,8 @@ export class Viewer {
       filename: "DamagedHelmet.glb",
     };
 
-    new ModelContainer(root).loadGltf(file);
+    new ModelContainer(root).loadGltf(file, (entity) =>
+      camera.focusOnEntity(entity)
+    );
   }
 }
