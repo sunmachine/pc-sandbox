@@ -1,15 +1,13 @@
 import * as pc from "playcanvas";
 import { Actor } from "./Actor";
-import {
-  cartesianToSpherical,
-  SphericalCoords,
-} from "../types/SphericalCoords";
+import { SphericalCoords } from "../types/SphericalCoords";
 import type { Vector3 } from "../types/Vectors";
 import { Viewer } from "../Viewer";
 import { Direction, hasDirection } from "../types/Direction";
+import { degToRad } from "../types/Radians";
 
 export class Camera extends Actor {
-  cameraCoords: SphericalCoords = cartesianToSpherical(pc.Vec3.ZERO);
+  cameraCoords = new SphericalCoords(5, degToRad(45.0), degToRad(22.0));
   focus: Vector3 = new pc.Vec3();
 
   private _camPosUpdate: Vector3 = new pc.Vec3();
@@ -52,8 +50,7 @@ export class Camera extends Actor {
     Viewer.app.keyboard.on("keydown", (e) => this.onKeyDown(e));
     Viewer.app.keyboard.on("keyup", (e) => this.onKeyUp(e));
 
-    // Setup default positions.
-    cartesianToSpherical(new pc.Vec3(0, 1, 3), this.cameraCoords);
+    // Initialize camera.
     this.updateCameraFocus();
   }
 
