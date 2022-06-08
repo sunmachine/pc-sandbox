@@ -2,10 +2,12 @@
 import { Viewer } from "@/app/Viewer";
 import { ref, onMounted } from "vue";
 
-const application = ref(null);
+const application = ref<HTMLCanvasElement | null>(null);
 
 onMounted(() => {
-  const canvas = application.value as unknown as Element;
+  const canvas = application.value;
+  if (!canvas) throw new Error("Cannot find canvas element.");
+
   const viewer = new Viewer(canvas);
   viewer.start();
 });
