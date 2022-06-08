@@ -2,7 +2,7 @@ import * as pc from "playcanvas";
 import { Camera } from "./actors/Camera";
 import { Grid } from "./actors/Grid";
 import { Light } from "./actors/Light";
-import { SpinningCube } from "./actors/SpinningCube";
+import { ModelContainer } from "./actors/ModelContainer";
 import { Skybox } from "./skybox/Skybox";
 
 export class Viewer {
@@ -35,7 +35,6 @@ export class Viewer {
 
   private setupScene() {
     const root = Viewer.app.root;
-    const defaultMaterial = new pc.StandardMaterial();
 
     // Setup Skybox.
     const { envAtlas, skybox } = new Skybox().generate();
@@ -46,6 +45,12 @@ export class Viewer {
     new Camera(root);
     new Light(root);
     new Grid(root);
-    new SpinningCube(root, defaultMaterial);
+
+    const file = {
+      url: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/DamagedHelmet/glTF-Binary/DamagedHelmet.glb",
+      filename: "DamagedHelmet.glb",
+    };
+
+    new ModelContainer(root).loadGltf(file);
   }
 }
