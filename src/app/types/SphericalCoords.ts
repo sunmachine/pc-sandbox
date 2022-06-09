@@ -1,11 +1,15 @@
 import * as pc from "playcanvas";
 import type { Radian as Radians } from "./Radians";
 import type { Vector3 } from "./Vectors";
+import type { Vectorlike } from "./Vectorlike";
 
-export interface SphericalCoords {
+export interface SphericalCoords extends Vectorlike<SphericalCoords> {
   radius: number;
   polar: Radians; // Phi in physics standard.
   elevation: Radians; // Theta in phyiscs standard.
+
+  copy(rhs: SphericalCoords): this;
+  lerp(lhs: SphericalCoords, rhs: SphericalCoords, t: number): this;
 }
 
 export class SphericalCoords {
@@ -15,7 +19,21 @@ export class SphericalCoords {
     public elevation: Radians
   ) {}
 
-  public toCartesian(outVec?: Vector3): Vector3 {
+  copy(rhs: SphericalCoords): this {
+    this.radius = rhs.radius;
+    this.polar = rhs.polar;
+    this.elevation = rhs.elevation;
+    return this;
+  }
+
+  lerp(lhs: SphericalCoords, rhs: SphericalCoords, t: number): this {
+    this.radius = lhs.radius + t * (rhs.radius - lhs.radius);
+    this.polar = lhs.polar + t * (rhs.polar - lhs.polar);
+    this.elevation = lhs.elevation + t * (rhs.elevation - lhs.elevation);
+    return this;
+  }
+
+  toCartesian(outVec?: Vector3): Vector3 {
     return sphericalToCartesian(
       this.radius,
       this.polar,
