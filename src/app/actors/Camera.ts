@@ -77,12 +77,10 @@ export class Camera extends Actor {
   }
 
   private onMouseWheel(evt: pc.MouseEvent) {
-    if (evt) {
-      this.zoom(evt);
+    this.zoom(evt);
 
-      if (evt.wheelDelta) {
-        evt.event.preventDefault();
-      }
+    if (evt.wheelDelta) {
+      evt.event.preventDefault();
     }
   }
 
