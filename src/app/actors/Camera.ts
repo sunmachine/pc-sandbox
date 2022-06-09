@@ -1,5 +1,6 @@
 import * as pc from "playcanvas";
 import { Actor } from "./Actor";
+import { AnimatedVector } from "../types/AnimatedVector";
 import { SphericalCoords } from "../types/SphericalCoords";
 import type { Vector3 } from "../types/Vectors";
 import { Viewer } from "../Viewer";
@@ -7,14 +8,18 @@ import { Direction, hasDirection } from "../types/Direction";
 import { degToRad } from "../types/Radians";
 
 export class Camera extends Actor {
-  cameraCoords = new SphericalCoords(5, degToRad(45.0), degToRad(22.0));
-  focus: Vector3 = new pc.Vec3();
+  cameraCoords = new AnimatedVector(
+    new SphericalCoords(5, degToRad(45.0), degToRad(22.0))
+  );
+  focus = new AnimatedVector(new pc.Vec3());
 
-  private _camPosUpdate: Vector3 = new pc.Vec3();
   private _moveDir: Direction = Direction.NONE;
   private _pressedKeys = new Set<number>();
   private _isMoving = false;
-  private _dirty = true;
+
+  readonly #camCoordUpdate = new SphericalCoords();
+  readonly #camPosUpdate: Vector3 = new pc.Vec3();
+  readonly #focusUpdate: Vector3 = new pc.Vec3();
 
   private readonly panSpeedScalar = 0.01;
   private readonly orbitSpeedScalar = 0.01;
@@ -50,9 +55,6 @@ export class Camera extends Actor {
     Viewer.app.mouse.on("mousewheel", (e) => this.onMouseWheel(e));
     Viewer.app.keyboard.on("keydown", (e) => this.onKeyDown(e));
     Viewer.app.keyboard.on("keyup", (e) => this.onKeyUp(e));
-
-    // Immediately set dirty for an update.
-    this.setDirty();
   }
 
   update(dt: number) {
@@ -60,25 +62,18 @@ export class Camera extends Actor {
       this.move(dt);
     }
 
-    if (this._dirty) {
-      this.updateCameraFocus();
-      this._dirty = false;
+    if (this.cameraCoords.update(dt) || this.focus.update(dt)) {
+      this.cameraCoords.value
+        .toCartesian(this.#camPosUpdate)
+        .add(this.focus.value);
+
+      this.entity.setPosition(this.#camPosUpdate);
+      this.entity.lookAt(this.focus.value);
     }
   }
 
   focusOnEntity(target: pc.Entity) {
-    this.focus.copy(target.getPosition());
-    this.setDirty();
-  }
-
-  private setDirty() {
-    if (!this._dirty) this._dirty = true;
-  }
-
-  private updateCameraFocus() {
-    this.cameraCoords.toCartesian(this._camPosUpdate).add(this.focus);
-    this.entity.setPosition(this._camPosUpdate);
-    this.entity.lookAt(this.focus);
+    this.focus.goto(target.getPosition());
   }
 
   private onMouseWheel(evt: pc.MouseEvent) {
@@ -150,7 +145,7 @@ export class Camera extends Actor {
         ) => {
           // Handle operations in this order to avoid GC.
           // prettier-ignore
-          return this._camPosUpdate
+          return this.#camPosUpdate
             .copy(vec)
             .mulScalar(
               scale *
@@ -160,7 +155,8 @@ export class Camera extends Actor {
         const moveSpeed = dt * this.moveSpeedScalar;
 
         // prettier-ignore
-        this.focus
+        this.#focusUpdate
+          .copy(this.focus.value)
           .add(scaleBy(
               transform.forward,
               moveSpeed,
@@ -179,17 +175,17 @@ export class Camera extends Actor {
             Direction.DOWN, 
             Direction.UP
           ));
+        this.focus.goto(this.#focusUpdate);
       }
-
-      this.setDirty();
     }
   }
 
   private orbit(evt: pc.MouseEvent) {
     if (evt.dx && evt.dy) {
-      this.cameraCoords.polar += evt.dx * this.orbitSpeedScalar;
-      this.cameraCoords.elevation += evt.dy * this.orbitSpeedScalar;
-      this.setDirty();
+      const update = this.#camCoordUpdate.copy(this.cameraCoords.value);
+      update.polar += evt.dx * this.orbitSpeedScalar;
+      update.elevation += evt.dy * this.orbitSpeedScalar;
+      this.cameraCoords.goto(update);
     }
   }
 
@@ -199,21 +195,24 @@ export class Camera extends Actor {
       if (transform) {
         const scaleBy = (vec: Vector3, scale: number) => {
           // Handle operations in this order to avoid GC.
-          this._camPosUpdate.copy(vec);
-          return this._camPosUpdate.mulScalar(scale);
+          return this.#camPosUpdate.copy(vec).mulScalar(scale);
         };
-        this.focus
+
+        this.#focusUpdate
+          .copy(this.focus.value)
           .add(scaleBy(transform.up, this.panSpeedScalar * evt.dy))
           .add(scaleBy(transform.right, this.panSpeedScalar * -evt.dx));
-        this.setDirty();
+
+        this.focus.goto(this.#focusUpdate);
       }
     }
   }
 
   private zoom(evt: pc.MouseEvent) {
     if (evt.wheelDelta) {
-      this.cameraCoords.radius += evt.wheelDelta * this.zoomSpeedScalar;
-      this.setDirty();
+      const update = this.#camCoordUpdate.copy(this.cameraCoords.value);
+      update.radius += evt.wheelDelta * this.zoomSpeedScalar;
+      this.cameraCoords.goto(update);
     }
   }
 }
