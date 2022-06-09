@@ -17,10 +17,6 @@ export class Camera extends Actor {
   private _pressedKeys = new Set<number>();
   private _isMoving = false;
 
-  readonly #camCoordUpdate = new SphericalCoords();
-  readonly #camPosUpdate: Vector3 = new pc.Vec3();
-  readonly #focusUpdate: Vector3 = new pc.Vec3();
-
   private readonly panSpeedScalar = 0.01;
   private readonly orbitSpeedScalar = 0.033;
   private readonly moveSpeedScalar = 10.0;
@@ -57,17 +53,15 @@ export class Camera extends Actor {
     Viewer.app.keyboard.on("keyup", (e) => this.onKeyUp(e));
   }
 
+  #update = new pc.Vec3();
   update(dt: number) {
     if (this._isMoving) {
       this.move(dt);
     }
 
     if (this.cameraCoords.update(dt) || this.focus.update(dt)) {
-      this.cameraCoords.value
-        .toCartesian(this.#camPosUpdate)
-        .add(this.focus.value);
-
-      this.entity.setPosition(this.#camPosUpdate);
+      this.cameraCoords.value.toCartesian(this.#update).add(this.focus.value);
+      this.entity.setPosition(this.#update);
       this.entity.lookAt(this.focus.value);
     }
   }
@@ -130,6 +124,8 @@ export class Camera extends Actor {
     }
   }
 
+  #moveA = new pc.Vec3();
+  #moveB = new pc.Vec3();
   private move(dt: number) {
     if (this._moveDir !== 0) {
       const transform = this.entity;
@@ -143,7 +139,7 @@ export class Camera extends Actor {
         ) => {
           // Handle operations in this order to avoid GC.
           // prettier-ignore
-          return this.#camPosUpdate
+          return this.#moveA
             .copy(vec)
             .mulScalar(
               scale *
@@ -153,7 +149,7 @@ export class Camera extends Actor {
         const moveSpeed = dt * this.moveSpeedScalar;
 
         // prettier-ignore
-        this.#focusUpdate
+        this.#moveB
           .copy(this.focus.value)
           .add(scaleBy(
               transform.forward,
@@ -162,53 +158,57 @@ export class Camera extends Actor {
               Direction.FORWARD
           ))
           .add(scaleBy(
-            transform.right, 
-            moveSpeed, 
-            Direction.LEFT, 
+            transform.right,
+            moveSpeed,
+            Direction.LEFT,
             Direction.RIGHT
           ))
           .add(scaleBy(
-            transform.up, 
-            moveSpeed, 
-            Direction.DOWN, 
+            transform.up,
+            moveSpeed,
+            Direction.DOWN,
             Direction.UP
           ));
-        this.focus.goto(this.#focusUpdate);
+        this.focus.goto(this.#moveB);
       }
     }
   }
 
+  #orbit = new SphericalCoords();
   private orbit(evt: pc.MouseEvent) {
     if (evt.dx && evt.dy) {
-      const update = this.#camCoordUpdate.copy(this.cameraCoords.value);
+      const update = this.#orbit.copy(this.cameraCoords.value);
       update.polar += evt.dx * this.orbitSpeedScalar;
       update.elevation += evt.dy * this.orbitSpeedScalar;
       this.cameraCoords.goto(update);
     }
   }
 
+  #panA = new pc.Vec3();
+  #panB = new pc.Vec3();
   private pan(evt: pc.MouseEvent) {
     if (evt.dx && evt.dy) {
       const transform = this.entity;
       if (transform) {
         const scaleBy = (vec: Vector3, scale: number) => {
           // Handle operations in this order to avoid GC.
-          return this.#camPosUpdate.copy(vec).mulScalar(scale);
+          return this.#panA.copy(vec).mulScalar(scale);
         };
 
-        this.#focusUpdate
+        this.#panB
           .copy(this.focus.value)
           .add(scaleBy(transform.up, this.panSpeedScalar * evt.dy))
           .add(scaleBy(transform.right, this.panSpeedScalar * -evt.dx));
 
-        this.focus.goto(this.#focusUpdate);
+        this.focus.goto(this.#panB);
       }
     }
   }
 
+  #zoom = new SphericalCoords();
   private zoom(evt: pc.MouseEvent) {
     if (evt.wheelDelta) {
-      const update = this.#camCoordUpdate.copy(this.cameraCoords.value);
+      const update = this.#zoom.copy(this.cameraCoords.value);
       update.radius += evt.wheelDelta * this.zoomSpeedScalar;
       this.cameraCoords.goto(update);
     }
