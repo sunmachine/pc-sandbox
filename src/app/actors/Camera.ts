@@ -13,6 +13,7 @@ export class Camera extends Actor {
   );
   focus = new AnimatedVector(new pc.Vec3());
 
+  private _initialFocus: Vector3 = new pc.Vec3();
   private _moveDir: Direction = Direction.NONE;
   private _pressedKeys = new Set<number>();
   private _isMoving = false;
@@ -59,15 +60,19 @@ export class Camera extends Actor {
       this.move(dt);
     }
 
-    if (this.cameraCoords.update(dt) || this.focus.update(dt)) {
+    const updateCoord = this.cameraCoords.update(dt);
+    const updateFocus = this.focus.update(dt);
+
+    if (updateCoord || updateFocus) {
       this.cameraCoords.value.toCartesian(this.#update).add(this.focus.value);
       this.entity.setPosition(this.#update);
       this.entity.lookAt(this.focus.value);
     }
   }
 
-  focusOnEntity(target: pc.Entity) {
-    this.focus.goto(target.getPosition());
+  focusOnEntity(target?: pc.Entity) {
+    if (target) this._initialFocus.copy(target.getPosition());
+    this.focus.goto(this._initialFocus);
   }
 
   private onMouseWheel(evt: pc.MouseEvent) {
