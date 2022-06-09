@@ -1,0 +1,37 @@
+import { Vectorlike } from "./Vectorlike";
+
+export class AnimatedVector<T extends Vectorlike<T>> {
+  value: T;
+  start: T;
+  target: T;
+  duration: number;
+  timer: number;
+
+  constructor(value: T, duration: number) {
+    this.value = value;
+    this.start = value;
+    this.target = value;
+    this.duration = duration;
+    this.timer = 0;
+  }
+
+  goto(target: T) {
+    this.timer = 0;
+    this.start.copy(target);
+    this.target.copy(target);
+  }
+
+  update(dt: number) {
+    if (this.timer < this.duration) {
+      this.timer = Math.min(this.timer + dt, this.duration);
+      const n = this.timer / this.duration;
+      // const t = Math.sin(n * Math.PI / 2.0);        // sinosidal
+      // const t = n * (2 - n);                        // quadratic
+      // const t = 1 - --n * n * n * n;                // quartic
+      const t = (n - 1) ** 5 + 1; // quintic
+      this.value.lerp(this.start, this.target, t);
+    } else {
+      this.value.copy(this.target);
+    }
+  }
+}
