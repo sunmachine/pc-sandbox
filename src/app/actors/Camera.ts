@@ -23,6 +23,11 @@ export class Camera extends Actor {
   private readonly moveSpeedScalar = 10.0;
   private readonly zoomSpeedScalar = 0.5;
 
+  // Lazy pool vars.
+  readonly #vecA = new pc.Vec3();
+  readonly #vecB = new pc.Vec3();
+  readonly #sphA = new SphericalCoords();
+
   private readonly keyMapping = [
     { key: pc.KEY_UP, direction: Direction.FORWARD },
     { key: pc.KEY_W, direction: Direction.FORWARD },
@@ -54,7 +59,6 @@ export class Camera extends Actor {
     Viewer.app.keyboard.on("keyup", (e) => this.onKeyUp(e));
   }
 
-  #update = new pc.Vec3();
   update(dt: number) {
     if (this._isMoving) {
       this.move(dt);
@@ -64,8 +68,8 @@ export class Camera extends Actor {
     const updateFocus = this.focus.update(dt);
 
     if (updateCoord || updateFocus) {
-      this.cameraCoords.value.toCartesian(this.#update).add(this.focus.value);
-      this.entity.setPosition(this.#update);
+      this.cameraCoords.value.toCartesian(this.#vecA).add(this.focus.value);
+      this.entity.setPosition(this.#vecA);
       this.entity.lookAt(this.focus.value);
     }
   }
@@ -129,8 +133,6 @@ export class Camera extends Actor {
     }
   }
 
-  #moveA = new pc.Vec3();
-  #moveB = new pc.Vec3();
   private move(dt: number) {
     if (this._moveDir !== 0) {
       const transform = this.entity;
@@ -144,7 +146,7 @@ export class Camera extends Actor {
         ) => {
           // Handle operations in this order to avoid GC.
           // prettier-ignore
-          return this.#moveA
+          return this.#vecA
             .copy(vec)
             .mulScalar(
               scale *
@@ -154,7 +156,7 @@ export class Camera extends Actor {
         const moveSpeed = dt * this.moveSpeedScalar;
 
         // prettier-ignore
-        this.#moveB
+        this.#vecB
           .copy(this.focus.value)
           .add(scaleBy(
               transform.forward,
@@ -174,46 +176,42 @@ export class Camera extends Actor {
             Direction.DOWN,
             Direction.UP
           ));
-        this.focus.goto(this.#moveB);
+        this.focus.goto(this.#vecB);
       }
     }
   }
 
-  #orbit = new SphericalCoords();
   private orbit(evt: pc.MouseEvent) {
     if (evt.dx && evt.dy) {
-      const update = this.#orbit.copy(this.cameraCoords.value);
+      const update = this.#sphA.copy(this.cameraCoords.value);
       update.polar += evt.dx * this.orbitSpeedScalar;
       update.elevation += evt.dy * this.orbitSpeedScalar;
       this.cameraCoords.goto(update);
     }
   }
 
-  #panA = new pc.Vec3();
-  #panB = new pc.Vec3();
   private pan(evt: pc.MouseEvent) {
     if (evt.dx && evt.dy) {
       const transform = this.entity;
       if (transform) {
         const scaleBy = (vec: Vector3, scale: number) => {
           // Handle operations in this order to avoid GC.
-          return this.#panA.copy(vec).mulScalar(scale);
+          return this.#vecA.copy(vec).mulScalar(scale);
         };
 
-        this.#panB
+        this.#vecB
           .copy(this.focus.value)
           .add(scaleBy(transform.up, this.panSpeedScalar * evt.dy))
           .add(scaleBy(transform.right, this.panSpeedScalar * -evt.dx));
 
-        this.focus.goto(this.#panB);
+        this.focus.goto(this.#vecB);
       }
     }
   }
 
-  #zoom = new SphericalCoords();
   private zoom(evt: pc.MouseEvent) {
     if (evt.wheelDelta) {
-      const update = this.#zoom.copy(this.cameraCoords.value);
+      const update = this.#sphA.copy(this.cameraCoords.value);
       update.radius += evt.wheelDelta * this.zoomSpeedScalar;
       this.cameraCoords.goto(update);
     }
