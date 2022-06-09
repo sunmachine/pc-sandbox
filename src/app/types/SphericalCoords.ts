@@ -13,11 +13,19 @@ export interface SphericalCoords extends Vectorlike<SphericalCoords> {
 }
 
 export class SphericalCoords {
-  constructor(
-    public radius: number,
-    public polar: Radians,
-    public elevation: Radians
-  ) {}
+  radius: number;
+  polar: Radians;
+  elevation: Radians;
+
+  constructor(radius?: number, polar?: Radians, elevation?: Radians) {
+    this.radius = radius ?? 0;
+    this.polar = polar ?? 0;
+    this.elevation = elevation ?? 0;
+  }
+
+  clone(): SphericalCoords {
+    return new SphericalCoords().copy(this);
+  }
 
   copy(rhs: SphericalCoords): this {
     this.radius = rhs.radius;
