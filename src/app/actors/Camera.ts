@@ -6,6 +6,7 @@ import type { Vector3 } from "../types/Vectors";
 import { Viewer } from "../Viewer";
 import { Direction, hasDirection } from "../types/Direction";
 import { degToRad } from "../types/Radians";
+import type { KeyMapping } from "../types/Keyboard";
 
 export class Camera extends Actor {
   cameraCoords = new AnimatedVector(
@@ -28,7 +29,7 @@ export class Camera extends Actor {
   readonly #vecB = new pc.Vec3();
   readonly #sphA = new SphericalCoords();
 
-  private readonly keyMapping = [
+  private readonly keyMapping: Array<KeyMapping> = [
     { key: pc.KEY_UP, direction: Direction.FORWARD },
     { key: pc.KEY_W, direction: Direction.FORWARD },
     { key: pc.KEY_RIGHT, direction: Direction.RIGHT },
@@ -39,6 +40,7 @@ export class Camera extends Actor {
     { key: pc.KEY_A, direction: Direction.LEFT },
     { key: pc.KEY_E, direction: Direction.UP },
     { key: pc.KEY_Q, direction: Direction.DOWN },
+    { key: pc.KEY_F, callback: () => this.focusOnEntity() },
   ];
 
   constructor(root: pc.Entity) {
@@ -101,11 +103,12 @@ export class Camera extends Actor {
     this.keyMapping.forEach((map) => {
       if (
         Viewer.app.keyboard.isPressed(map.key) &&
-        !this._pressedKeys.has(map.key) &&
-        hasDirection(this._moveDir, map.direction) === false
+        !this._pressedKeys.has(map.key)
       ) {
+        if (map.direction && !hasDirection(this._moveDir, map.direction)) {
+          this._moveDir += map.direction;
+        }
         this._pressedKeys.add(map.key);
-        this._moveDir += map.direction;
       }
     });
 
@@ -119,11 +122,13 @@ export class Camera extends Actor {
     this.keyMapping.forEach((map) => {
       if (
         !Viewer.app.keyboard.isPressed(map.key) &&
-        this._pressedKeys.has(map.key) &&
-        hasDirection(this._moveDir, map.direction)
+        this._pressedKeys.has(map.key)
       ) {
+        if (map.direction && hasDirection(this._moveDir, map.direction)) {
+          this._moveDir -= map.direction;
+        }
+        if (map.callback) map.callback();
         this._pressedKeys.delete(map.key);
-        this._moveDir -= map.direction;
       }
     });
 
