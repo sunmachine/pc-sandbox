@@ -14,6 +14,7 @@ export class Camera extends Actor {
   private _moveDir: Direction = Direction.NONE;
   private _pressedKeys = new Set<number>();
   private _isMoving = false;
+  private _dirty = true;
 
   private readonly panSpeedScalar = 0.01;
   private readonly orbitSpeedScalar = 0.01;
@@ -50,19 +51,28 @@ export class Camera extends Actor {
     Viewer.app.keyboard.on("keydown", (e) => this.onKeyDown(e));
     Viewer.app.keyboard.on("keyup", (e) => this.onKeyUp(e));
 
-    // Initialize camera.
-    this.updateCameraFocus();
+    // Immediately set dirty for an update.
+    this.setDirty();
   }
 
   update(dt: number) {
     if (this._isMoving) {
       this.move(dt);
     }
+
+    if (this._dirty) {
+      this.updateCameraFocus();
+      this._dirty = false;
+    }
   }
 
   focusOnEntity(target: pc.Entity) {
     this.focus.copy(target.getPosition());
-    this.updateCameraFocus();
+    this.setDirty();
+  }
+
+  private setDirty() {
+    if (!this._dirty) this._dirty = true;
   }
 
   private updateCameraFocus() {
@@ -132,24 +142,46 @@ export class Camera extends Actor {
       const transform = this.entity;
 
       if (transform) {
-        const scaleBy = (vec: Vector3, n: Direction, p: Direction) => {
+        const scaleBy = (
+          vec: Vector3,
+          scale: number,
+          n: Direction,
+          p: Direction
+        ) => {
+          // Handle operations in this order to avoid GC.
+          // prettier-ignore
           return this._camPosUpdate
             .copy(vec)
             .mulScalar(
-              dt *
-                this.moveSpeedScalar *
+              scale *
                 (-1 * +hasDirection(this._moveDir, n) +
-                  1 * +hasDirection(this._moveDir, p))
-            );
+                  1 * +hasDirection(this._moveDir, p)));
         };
+        const moveSpeed = dt * this.moveSpeedScalar;
 
+        // prettier-ignore
         this.focus
-          .add(scaleBy(transform.forward, Direction.BACK, Direction.FORWARD))
-          .add(scaleBy(transform.right, Direction.LEFT, Direction.RIGHT))
-          .add(scaleBy(transform.up, Direction.DOWN, Direction.UP));
-
-        this.updateCameraFocus();
+          .add(scaleBy(
+              transform.forward,
+              moveSpeed,
+              Direction.BACK,
+              Direction.FORWARD
+          ))
+          .add(scaleBy(
+            transform.right, 
+            moveSpeed, 
+            Direction.LEFT, 
+            Direction.RIGHT
+          ))
+          .add(scaleBy(
+            transform.up, 
+            moveSpeed, 
+            Direction.DOWN, 
+            Direction.UP
+          ));
       }
+
+      this.setDirty();
     }
   }
 
@@ -157,22 +189,31 @@ export class Camera extends Actor {
     if (evt.dx && evt.dy) {
       this.cameraCoords.polar += evt.dx * this.orbitSpeedScalar;
       this.cameraCoords.elevation += evt.dy * this.orbitSpeedScalar;
-      this.updateCameraFocus();
+      this.setDirty();
     }
   }
 
   private pan(evt: pc.MouseEvent) {
     if (evt.dx && evt.dy) {
-      this.focus.x -= evt.dx * this.panSpeedScalar;
-      this.focus.y += evt.dy * this.panSpeedScalar;
-      this.updateCameraFocus();
+      const transform = this.entity;
+      if (transform) {
+        const scaleBy = (vec: Vector3, scale: number) => {
+          // Handle operations in this order to avoid GC.
+          this._camPosUpdate.copy(vec);
+          return this._camPosUpdate.mulScalar(scale);
+        };
+        this.focus
+          .add(scaleBy(transform.up, this.panSpeedScalar * evt.dy))
+          .add(scaleBy(transform.right, this.panSpeedScalar * -evt.dx));
+        this.setDirty();
+      }
     }
   }
 
   private zoom(evt: pc.MouseEvent) {
     if (evt.wheelDelta) {
       this.cameraCoords.radius += evt.wheelDelta * this.zoomSpeedScalar;
-      this.updateCameraFocus();
+      this.setDirty();
     }
   }
 }
