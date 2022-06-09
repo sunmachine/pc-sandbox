@@ -22,9 +22,9 @@ export class Camera extends Actor {
   readonly #focusUpdate: Vector3 = new pc.Vec3();
 
   private readonly panSpeedScalar = 0.01;
-  private readonly orbitSpeedScalar = 0.01;
-  private readonly moveSpeedScalar = 1;
-  private readonly zoomSpeedScalar = 0.1;
+  private readonly orbitSpeedScalar = 0.033;
+  private readonly moveSpeedScalar = 10.0;
+  private readonly zoomSpeedScalar = 0.5;
 
   private readonly keyMapping = [
     { key: pc.KEY_UP, direction: Direction.FORWARD },
