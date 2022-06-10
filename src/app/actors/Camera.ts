@@ -182,10 +182,10 @@ export class CameraInput {
     this._camera = camera;
 
     // Register controls.
-    Viewer.app.keyboard.on("keydown", (e) => this.onKeyDown(e));
-    Viewer.app.keyboard.on("keyup", (e) => this.onKeyUp(e));
-    Viewer.app.mouse.on("mousemove", (e) => this.onMouseMove(e));
-    Viewer.app.mouse.on("mousewheel", (e) => this.onMouseWheel(e));
+    Viewer.app.keyboard.on(pc.EVENT_KEYDOWN, (e) => this.onKeyDown(e));
+    Viewer.app.keyboard.on(pc.EVENT_KEYUP, (e) => this.onKeyUp(e));
+    Viewer.app.mouse.on(pc.EVENT_MOUSEMOVE, (e) => this.onMouseMove(e));
+    Viewer.app.mouse.on(pc.EVENT_MOUSEWHEEL, (e) => this.onMouseWheel(e));
   }
 
   private onKeyDown(evt: pc.KeyboardEvent) {
