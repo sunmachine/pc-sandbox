@@ -61,6 +61,7 @@ export class Camera extends Actor {
   }
 
   update(dt: number) {
+    this._input.update();
     if (this._input.isMoving) {
       this.move(dt);
     }
@@ -78,6 +79,7 @@ export class Camera extends Actor {
   focusOnEntity(target?: pc.Entity) {
     this.cameraCoords.stop();
     this.focus.stop();
+    this._input.ignoreRemainingWheelInertia();
 
     if (target) this._initialFocus.copy(target.getPosition());
     this.focus.goto(this._initialFocus);
@@ -181,6 +183,11 @@ export class CameraInput {
   private _pressedKeys = new Set<number>();
   private _camera: Camera;
 
+  private _wheelInertia = false;
+  private _ignoreRemainingInertia = false;
+  #inertiaLastFrame = 0;
+  #inertiaCount = 0;
+
   constructor(camera: Camera) {
     this._camera = camera;
 
@@ -189,6 +196,14 @@ export class CameraInput {
     Viewer.app.keyboard.on(pc.EVENT_KEYUP, (e) => this.onKeyUp(e));
     Viewer.app.mouse.on(pc.EVENT_MOUSEMOVE, (e) => this.onMouseMove(e));
     Viewer.app.mouse.on(pc.EVENT_MOUSEWHEEL, (e) => this.onMouseWheel(e));
+  }
+
+  update() {
+    this.checkInertiaStop();
+  }
+
+  ignoreRemainingWheelInertia() {
+    this._ignoreRemainingInertia = true;
   }
 
   private onKeyDown(evt: pc.KeyboardEvent) {
@@ -243,10 +258,31 @@ export class CameraInput {
   }
 
   private onMouseWheel(evt: pc.MouseEvent) {
-    this._camera.zoom(evt);
+    if (!this._ignoreRemainingInertia) this._camera.zoom(evt);
 
     if (evt.wheelDelta) {
+      this.updateInertia();
       evt.event.preventDefault();
+    }
+  }
+
+  private updateInertia() {
+    this._wheelInertia = true;
+    this.#inertiaCount++;
+  }
+
+  private checkInertiaStop() {
+    if (
+      this._wheelInertia &&
+      this.#inertiaCount !== 0 &&
+      this.#inertiaCount === this.#inertiaLastFrame
+    ) {
+      this.#inertiaCount = 0;
+      this.#inertiaLastFrame = 0;
+      this._wheelInertia = false;
+      this._ignoreRemainingInertia = false;
+    } else {
+      this.#inertiaLastFrame = this.#inertiaCount;
     }
   }
 }
