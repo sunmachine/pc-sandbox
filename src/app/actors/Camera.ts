@@ -127,7 +127,6 @@ export class Camera extends Actor {
 
   orbit(evt: pc.MouseEvent) {
     if (evt.dx && evt.dy) {
-      console.log(this === undefined);
       const update = this.#sphA.copy(this.cameraCoords.value);
       update.polar += evt.dx * this.orbitSpeedScalar;
       update.elevation += evt.dy * this.orbitSpeedScalar;
