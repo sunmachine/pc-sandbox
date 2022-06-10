@@ -8,24 +8,25 @@ export interface GradientKey {
 }
 
 export interface Gradient {
-  readonly sentries: Array<GradientKey>;
-
+  readonly entries: Array<GradientKey>;
   sample(t: number): HexColor;
 }
 
 export class Gradient {
-  readonly entries: Array<GradientKey>;
+  readonly entries: Array<GradientKey> = [];
   constructor(entries?: Array<GradientKey>) {
     if (entries) {
       const min = Math.min(...entries.map((k) => k.index));
       const max = Math.max(...entries.map((k) => k.index));
-      this.entries = entries
-        .sort((a, b) => a.index - b.index)
-        .map((key) => ({
-          index: key.index - min / max - min,
-          color: key.color,
-        }));
-    } else this.entries = new Array<GradientKey>();
+      this.entries.push(
+        ...entries
+          .sort((a, b) => a.index - b.index)
+          .map((key) => ({
+            index: key.index - min / max - min,
+            color: key.color,
+          }))
+      );
+    }
   }
 
   sample(t: number): HexColor {
