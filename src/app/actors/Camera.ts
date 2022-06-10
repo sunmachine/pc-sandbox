@@ -14,7 +14,7 @@ export class Camera extends Actor {
   private readonly moveSpeedScalar = 10.0;
   private readonly zoomSpeedScalar = 0.5;
 
-  private readonly _initialCoords: SphericalCoords = new SphericalCoords(
+  private readonly _initialCoords = new SphericalCoords(
     5,
     degToRad(45.0),
     degToRad(22.0)
