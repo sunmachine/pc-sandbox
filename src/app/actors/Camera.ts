@@ -15,36 +15,38 @@ export class Camera extends Actor {
   focus = new AnimatedVector(new pc.Vec3());
 
   private _initialFocus: Vector3 = new pc.Vec3();
-  private _moveDir: Direction = Direction.NONE;
-  private _pressedKeys = new Set<number>();
-  private _isMoving = false;
 
   private readonly panSpeedScalar = 0.01;
   private readonly orbitSpeedScalar = 0.033;
   private readonly moveSpeedScalar = 10.0;
   private readonly zoomSpeedScalar = 0.5;
+  private readonly input: CameraInput;
 
   // Lazy pool vars.
   readonly #vecA = new pc.Vec3();
   readonly #vecB = new pc.Vec3();
   readonly #sphA = new SphericalCoords();
 
-  private readonly keyMapping: Array<KeyMapping> = [
-    { key: pc.KEY_UP, direction: Direction.FORWARD },
-    { key: pc.KEY_W, direction: Direction.FORWARD },
-    { key: pc.KEY_RIGHT, direction: Direction.RIGHT },
-    { key: pc.KEY_D, direction: Direction.RIGHT },
-    { key: pc.KEY_DOWN, direction: Direction.BACK },
-    { key: pc.KEY_S, direction: Direction.BACK },
-    { key: pc.KEY_LEFT, direction: Direction.LEFT },
-    { key: pc.KEY_A, direction: Direction.LEFT },
-    { key: pc.KEY_E, direction: Direction.UP },
-    { key: pc.KEY_Q, direction: Direction.DOWN },
-    { key: pc.KEY_F, callback: () => this.focusOnEntity() },
-  ];
-
   constructor(root: pc.Entity) {
     super(root);
+
+    // Register inputs.
+    this.input = new CameraInput(this);
+    this.input.keyMapping.push(
+      ...[
+        { key: pc.KEY_UP, direction: Direction.FORWARD },
+        { key: pc.KEY_W, direction: Direction.FORWARD },
+        { key: pc.KEY_RIGHT, direction: Direction.RIGHT },
+        { key: pc.KEY_D, direction: Direction.RIGHT },
+        { key: pc.KEY_DOWN, direction: Direction.BACK },
+        { key: pc.KEY_S, direction: Direction.BACK },
+        { key: pc.KEY_LEFT, direction: Direction.LEFT },
+        { key: pc.KEY_A, direction: Direction.LEFT },
+        { key: pc.KEY_E, direction: Direction.UP },
+        { key: pc.KEY_Q, direction: Direction.DOWN },
+        { key: pc.KEY_F, callback: () => this.focusOnEntity() },
+      ]
+    );
 
     // Setup entity.
     const camera = new pc.Entity("camera");
@@ -53,16 +55,10 @@ export class Camera extends Actor {
       clearColor: new pc.Color(0.15, 0.15, 0.15),
     });
     this.entity = camera;
-
-    // Register controls.
-    Viewer.app.mouse.on("mousemove", (e) => this.onMouseMove(e));
-    Viewer.app.mouse.on("mousewheel", (e) => this.onMouseWheel(e));
-    Viewer.app.keyboard.on("keydown", (e) => this.onKeyDown(e));
-    Viewer.app.keyboard.on("keyup", (e) => this.onKeyUp(e));
   }
 
   update(dt: number) {
-    if (this._isMoving) {
+    if (this.input.isMoving) {
       this.move(dt);
     }
 
@@ -81,65 +77,8 @@ export class Camera extends Actor {
     this.focus.goto(this._initialFocus);
   }
 
-  private onMouseWheel(evt: pc.MouseEvent) {
-    this.zoom(evt);
-
-    if (evt.wheelDelta) {
-      evt.event.preventDefault();
-    }
-  }
-
-  private onMouseMove(evt: pc.MouseEvent) {
-    if (Viewer.app.mouse.isPressed(pc.MOUSEBUTTON_LEFT)) {
-      if (Viewer.app.keyboard.isPressed(pc.KEY_SHIFT)) {
-        this.pan(evt);
-      } else {
-        this.orbit(evt);
-      }
-    }
-  }
-
-  private onKeyDown(evt: pc.KeyboardEvent) {
-    this.keyMapping.forEach((map) => {
-      if (
-        Viewer.app.keyboard.isPressed(map.key) &&
-        !this._pressedKeys.has(map.key)
-      ) {
-        if (map.direction && !hasDirection(this._moveDir, map.direction)) {
-          this._moveDir += map.direction;
-        }
-        this._pressedKeys.add(map.key);
-      }
-    });
-
-    if (this._moveDir > Direction.NONE && !this._isMoving) {
-      this._isMoving = true;
-      evt.event.preventDefault();
-    }
-  }
-
-  private onKeyUp(evt: pc.KeyboardEvent) {
-    this.keyMapping.forEach((map) => {
-      if (
-        !Viewer.app.keyboard.isPressed(map.key) &&
-        this._pressedKeys.has(map.key)
-      ) {
-        if (map.direction && hasDirection(this._moveDir, map.direction)) {
-          this._moveDir -= map.direction;
-        }
-        if (map.callback) map.callback();
-        this._pressedKeys.delete(map.key);
-      }
-    });
-
-    if (this._moveDir === Direction.NONE && this._isMoving) {
-      this._isMoving = false;
-      evt.event.preventDefault();
-    }
-  }
-
-  private move(dt: number) {
-    if (this._moveDir !== 0) {
+  move(dt: number) {
+    if (this.input.moveDirection !== 0) {
       const transform = this.entity;
 
       if (transform) {
@@ -155,8 +94,8 @@ export class Camera extends Actor {
             .copy(vec)
             .mulScalar(
               scale *
-                (-1 * +hasDirection(this._moveDir, n) +
-                  1 * +hasDirection(this._moveDir, p)));
+                (-hasDirection(this.input.moveDirection, n) +
+                  +hasDirection(this.input.moveDirection, p)));
         };
         const moveSpeed = dt * this.moveSpeedScalar;
 
@@ -186,8 +125,9 @@ export class Camera extends Actor {
     }
   }
 
-  private orbit(evt: pc.MouseEvent) {
+  orbit(evt: pc.MouseEvent) {
     if (evt.dx && evt.dy) {
+      console.log(this === undefined);
       const update = this.#sphA.copy(this.cameraCoords.value);
       update.polar += evt.dx * this.orbitSpeedScalar;
       update.elevation += evt.dy * this.orbitSpeedScalar;
@@ -195,7 +135,7 @@ export class Camera extends Actor {
     }
   }
 
-  private pan(evt: pc.MouseEvent) {
+  pan(evt: pc.MouseEvent) {
     if (evt.dx && evt.dy) {
       const transform = this.entity;
       if (transform) {
@@ -214,11 +154,89 @@ export class Camera extends Actor {
     }
   }
 
-  private zoom(evt: pc.MouseEvent) {
+  zoom(evt: pc.MouseEvent) {
     if (evt.wheelDelta) {
       const update = this.#sphA.copy(this.cameraCoords.value);
       update.radius += evt.wheelDelta * this.zoomSpeedScalar;
       this.cameraCoords.goto(update);
+    }
+  }
+}
+
+export class CameraInput {
+  isMoving = false;
+  moveDirection: Direction = Direction.NONE;
+  readonly keyMapping: Array<KeyMapping> = [];
+
+  private _pressedKeys = new Set<number>();
+  private _camera: Camera;
+
+  constructor(camera: Camera) {
+    this._camera = camera;
+
+    // Register controls.
+    Viewer.app.keyboard.on("keydown", (e) => this.onKeyDown(e));
+    Viewer.app.keyboard.on("keyup", (e) => this.onKeyUp(e));
+    Viewer.app.mouse.on("mousemove", (e) => this.onMouseMove(e));
+    Viewer.app.mouse.on("mousewheel", (e) => this.onMouseWheel(e));
+  }
+
+  private onKeyDown(evt: pc.KeyboardEvent) {
+    this.keyMapping.forEach((map) => {
+      if (
+        Viewer.app.keyboard.isPressed(map.key) &&
+        !this._pressedKeys.has(map.key)
+      ) {
+        if (map.direction && !hasDirection(this.moveDirection, map.direction)) {
+          this.moveDirection += map.direction;
+        }
+        this._pressedKeys.add(map.key);
+      }
+    });
+
+    if (this.moveDirection > Direction.NONE && !this.isMoving) {
+      this.isMoving = true;
+      evt.event.preventDefault();
+    }
+  }
+
+  private onKeyUp(evt: pc.KeyboardEvent) {
+    this.keyMapping.forEach((map) => {
+      if (
+        !Viewer.app.keyboard.isPressed(map.key) &&
+        this._pressedKeys.has(map.key)
+      ) {
+        if (map.direction && hasDirection(this.moveDirection, map.direction)) {
+          this.moveDirection -= map.direction;
+        }
+        if (map.callback) map.callback();
+        this._pressedKeys.delete(map.key);
+      }
+    });
+
+    if (this.moveDirection === Direction.NONE && this.isMoving) {
+      this.isMoving = false;
+      evt.event.preventDefault();
+    }
+  }
+
+  private onMouseMove(evt: pc.MouseEvent) {
+    if (Viewer.app.mouse.isPressed(pc.MOUSEBUTTON_LEFT)) {
+      if (Viewer.app.keyboard.isPressed(pc.KEY_SHIFT)) {
+        this._camera.pan(evt);
+      } else {
+        this._camera.orbit(evt);
+      }
+
+      evt.event.preventDefault();
+    }
+  }
+
+  private onMouseWheel(evt: pc.MouseEvent) {
+    this._camera.zoom(evt);
+
+    if (evt.wheelDelta) {
+      evt.event.preventDefault();
     }
   }
 }
