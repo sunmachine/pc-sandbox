@@ -79,7 +79,10 @@ export class Camera extends Actor {
     if (target) this._initialFocus.copy(target.getPosition());
     this.focus.goto(this._initialFocus);
 
-    this.cameraCoords.goto(this._initialCoords);
+    // Only reset radius.
+    this.#sphA.copy(this.cameraCoords.target).radius =
+      this._initialCoords.radius;
+    this.cameraCoords.goto(this.#sphA);
   }
 
   move(dt: number) {
