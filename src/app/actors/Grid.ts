@@ -33,8 +33,8 @@ export class Grid extends Actor {
       this.setColor(i, ext);
 
       this.#start.x = this.#end.x = i;
-      this.#start.z = -ext;
-      this.#end.z = i === 0 ? 0 : ext;
+      this.#start.z = ext;
+      this.#end.z = i === 0 ? 0 : -ext;
       this.drawLine();
 
       this.#start.x = -ext;
@@ -52,7 +52,7 @@ export class Grid extends Actor {
     this.drawLine();
 
     this.#end.x = 0;
-    this.#end.z = ext;
+    this.#end.z = -ext;
     this.#color.copy(this.colors.axisz);
     this.drawLine();
   }
