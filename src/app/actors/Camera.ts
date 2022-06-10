@@ -9,18 +9,21 @@ import { degToRad } from "../types/Radians";
 import type { KeyMapping } from "../types/Keyboard";
 
 export class Camera extends Actor {
-  cameraCoords = new AnimatedVector(
-    new SphericalCoords(5, degToRad(45.0), degToRad(22.0))
-  );
-  focus = new AnimatedVector(new pc.Vec3());
-
-  private _initialFocus: Vector3 = new pc.Vec3();
-
   private readonly panSpeedScalar = 0.01;
   private readonly orbitSpeedScalar = 0.033;
   private readonly moveSpeedScalar = 10.0;
   private readonly zoomSpeedScalar = 0.5;
-  private readonly input: CameraInput;
+
+  private readonly _initialCoords: SphericalCoords = new SphericalCoords(
+    5,
+    degToRad(45.0),
+    degToRad(22.0)
+  );
+  private readonly _initialFocus: Vector3 = new pc.Vec3();
+  private readonly _input: CameraInput;
+
+  cameraCoords = new AnimatedVector(this._initialCoords);
+  focus = new AnimatedVector(new pc.Vec3());
 
   // Lazy pool vars.
   readonly #vecA = new pc.Vec3();
@@ -31,8 +34,8 @@ export class Camera extends Actor {
     super(root);
 
     // Register inputs.
-    this.input = new CameraInput(this);
-    this.input.keyMapping.push(
+    this._input = new CameraInput(this);
+    this._input.keyMapping.push(
       ...[
         { key: pc.KEY_UP, direction: Direction.FORWARD },
         { key: pc.KEY_W, direction: Direction.FORWARD },
@@ -58,7 +61,7 @@ export class Camera extends Actor {
   }
 
   update(dt: number) {
-    if (this.input.isMoving) {
+    if (this._input.isMoving) {
       this.move(dt);
     }
 
@@ -75,10 +78,12 @@ export class Camera extends Actor {
   focusOnEntity(target?: pc.Entity) {
     if (target) this._initialFocus.copy(target.getPosition());
     this.focus.goto(this._initialFocus);
+
+    this.cameraCoords.goto(this._initialCoords);
   }
 
   move(dt: number) {
-    if (this.input.moveDirection !== 0) {
+    if (this._input.moveDirection !== 0) {
       const transform = this.entity;
 
       if (transform) {
@@ -94,8 +99,8 @@ export class Camera extends Actor {
             .copy(vec)
             .mulScalar(
               scale *
-                (-hasDirection(this.input.moveDirection, n) +
-                  +hasDirection(this.input.moveDirection, p)));
+                (-hasDirection(this._input.moveDirection, n) +
+                  +hasDirection(this._input.moveDirection, p)));
         };
         const moveSpeed = dt * this.moveSpeedScalar;
 
