@@ -1,5 +1,6 @@
 import * as pc from "playcanvas";
 import { Camera } from "./actors/Camera";
+import { Compass } from "./actors/Compass";
 import { Grid } from "./actors/Grid";
 import { Light } from "./actors/Light";
 import { ModelContainer } from "./actors/ModelContainer";
@@ -44,6 +45,7 @@ export class Viewer {
     const camera = new Camera(root);
     new Light(root);
     new Grid(root);
+    new Compass(root, camera);
 
     const file = {
       url: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/DamagedHelmet/glTF-Binary/DamagedHelmet.glb",
