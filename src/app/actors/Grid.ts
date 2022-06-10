@@ -3,17 +3,19 @@ import { Viewer } from "../Viewer";
 import { Actor } from "./Actor";
 
 export class Grid extends Actor {
-  private readonly _start = new pc.Vec3();
-  private readonly _end = new pc.Vec3();
-  private readonly _color = new pc.Color();
-
   private readonly size = 10;
   private readonly colors = {
-    axis: "#dddddd",
-    odd: "#888888",
-    even: "#555555",
-    edge: "#333333",
+    axis: new pc.Color().fromString("#bbbbbb"),
+    axisx: new pc.Color().fromString("#f44040"),
+    axisz: new pc.Color().fromString("#3747f0"),
+    odd: new pc.Color().fromString("#444444"),
+    even: new pc.Color().fromString("#555555"),
+    edge: new pc.Color().fromString("#333333"),
   };
+
+  readonly #start = new pc.Vec3();
+  readonly #end = new pc.Vec3();
+  readonly #color = new pc.Color();
 
   constructor(root: pc.Entity) {
     super(root);
@@ -26,29 +28,48 @@ export class Grid extends Actor {
   private drawGrid() {
     const ext = this.size / 2;
 
+    // Draw Grid
     for (let i = -ext; i <= ext; ++i) {
       this.setColor(i, ext);
 
-      this._start.x = this._end.x = i;
-      this._start.z = -ext;
-      this._end.z = ext;
+      this.#start.x = this.#end.x = i;
+      this.#start.z = -ext;
+      this.#end.z = i === 0 ? 0 : ext;
       this.drawLine();
 
-      this._start.x = -ext;
-      this._end.x = ext;
-      this._start.z = this._end.z = i;
+      this.#start.x = -ext;
+      this.#end.x = i === 0 ? 0 : ext;
+      this.#start.z = this.#end.z = i;
       this.drawLine();
     }
+
+    // Draw Axis Markers
+    this.#start.x = this.#start.z = 0;
+
+    this.#end.x = ext;
+    this.#end.z = 0;
+    this.#color.copy(this.colors.axisx);
+    this.drawLine();
+
+    this.#end.x = 0;
+    this.#end.z = ext;
+    this.#color.copy(this.colors.axisz);
+    this.drawLine();
   }
 
   private setColor(i: number, ext: number) {
-    if (i === 0) this._color.fromString(this.colors.axis);
-    else if (i === -ext || i === ext) this._color.fromString(this.colors.edge);
-    else if (i % 2 === 0) this._color.fromString(this.colors.even);
-    else this._color.fromString(this.colors.odd);
+    if (i === 0) {
+      this.#color.copy(this.colors.axis);
+    } else if (i === -ext || i === ext) {
+      this.#color.copy(this.colors.edge);
+    } else if (i % 2 === 0) {
+      this.#color.copy(this.colors.even);
+    } else {
+      this.#color.copy(this.colors.odd);
+    }
   }
 
   private drawLine() {
-    Viewer.app.drawLine(this._start, this._end, this._color, true);
+    Viewer.app.drawLine(this.#start, this.#end, this.#color, true);
   }
 }
