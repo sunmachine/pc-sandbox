@@ -24,7 +24,6 @@ export class Viewer {
     Viewer.#app = new pc.Application(canvas, {
       elementInput: new pc.ElementInput(canvas),
       mouse: new pc.Mouse(canvas),
-      touch: "ontouchstart" in window ? new pc.TouchDevice(canvas) : undefined,
       keyboard: new pc.Keyboard(window),
     });
 
