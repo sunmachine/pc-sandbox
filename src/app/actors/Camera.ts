@@ -76,6 +76,9 @@ export class Camera extends Actor {
   }
 
   focusOnEntity(target?: pc.Entity) {
+    this.cameraCoords.stop();
+    this.focus.stop();
+
     if (target) this._initialFocus.copy(target.getPosition());
     this.focus.goto(this._initialFocus);
 

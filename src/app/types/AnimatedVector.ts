@@ -21,6 +21,11 @@ export class AnimatedVector<T extends Vectorlike<T>> {
     this.target.copy(target);
   }
 
+  stop() {
+    this.timer = this.duration;
+    this.target.copy(this.value);
+  }
+
   /** @returns True if an update occured, false if not. */
   update(dt: number): boolean {
     if (this.timer < this.duration) {
