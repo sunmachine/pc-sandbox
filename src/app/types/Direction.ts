@@ -25,7 +25,7 @@ export function getPrettyDirection(direction: Direction): string {
 
 export function hasDirection(
   questionable: Direction,
-  targetDir: Direction
+  target: Direction
 ): boolean {
-  return (questionable & targetDir) > 0;
+  return (questionable & target) > 0;
 }
