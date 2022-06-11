@@ -7,12 +7,15 @@ import { Viewer } from "../Viewer";
 import { Direction, hasDirection } from "../types/Direction";
 import { degToRad } from "../types/Radians";
 import type { KeyMapping } from "../types/Keyboard";
+import { clamp } from "../utils/Math";
 
 export class Camera extends Actor {
   private readonly panSpeedScalar = 0.01;
   private readonly orbitSpeedScalar = 0.033;
   private readonly moveSpeedScalar = 10.0;
   private readonly zoomSpeedScalar = 0.5;
+
+  private readonly zoomRange = [1, 10];
 
   private readonly _initialCoords = new SphericalCoords(
     5,
@@ -169,7 +172,11 @@ export class Camera extends Actor {
   zoom(evt: pc.MouseEvent) {
     if (evt.wheelDelta) {
       const update = this.#sphA.copy(this.cameraCoords.value);
-      update.radius += evt.wheelDelta * this.zoomSpeedScalar;
+      update.radius = clamp(
+        update.radius + evt.wheelDelta * this.zoomSpeedScalar,
+        this.zoomRange[0],
+        this.zoomRange[1]
+      );
       this.cameraCoords.goto(update);
     }
   }
