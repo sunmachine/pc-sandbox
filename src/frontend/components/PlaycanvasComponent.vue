@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Viewer } from "@/app/Viewer";
 import { ref, onMounted } from "vue";
+import HudComponent from "./ui-hud/HudComponent.vue";
 
 const application = ref<HTMLCanvasElement | null>(null);
 
@@ -14,9 +15,8 @@ onMounted(() => {
 </script>
 
 <template>
-  <!-- <v-container> -->
+  <HudComponent />
   <canvas ref="application" id="playcanvas" />
-  <!-- </v-container> -->
 </template>
 
 <style scoped>
