@@ -1,17 +1,20 @@
 <script setup lang="ts">
 import { ref } from "vue";
 
+// https://materialdesignicons.com/ <--
 const items = ref([
-  { id: 0, label: "A" },
-  { id: 3, label: "B" },
-  { id: 1, label: "C" },
+  { id: 0, icon: "mdi-file-upload" },
+  { id: 3, icon: "mdi-weather-sunset" },
+  { id: 1, icon: "mdi-image-filter-center-focus" },
 ]);
 </script>
 
 <template>
   <div class="ui rounded-lg">
     <div v-for="item in items" :key="item.id">
-      <v-btn class="ui-button" flat>{{ item.label }}</v-btn>
+      <v-btn class="ui-button" icon rounded="lg">
+        <v-icon>{{ item.icon }}</v-icon>
+      </v-btn>
     </div>
   </div>
 </template>
