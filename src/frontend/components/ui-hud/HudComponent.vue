@@ -1,17 +1,32 @@
 <script setup lang="ts">
-import { ref } from "vue";
-import NotImplementedDialog from "../dialog/NotImplementedDialog.vue";
+import type { Viewer } from "@/app/Viewer";
+import { inject, ref } from "vue";
 
 // https://materialdesignicons.com/ <--
-const items = ref([{ id: 0, icon: "mdi-image-filter-center-focus" }]);
+const viewer = inject<Viewer>("viewer");
+
+const toolbarItems = ref([
+  {
+    id: 0,
+    icon: "mdi-image-filter-center-focus",
+    callback: () => {
+      if (viewer?.camera) viewer?.camera?.focusOnEntity();
+    },
+  },
+]);
 </script>
 
 <template>
   <div class="ui rounded-lg">
-    <div v-for="item in items" :key="item.id">
-      <v-btn class="ui-button" icon rounded="lg">
+    <div v-for="item in toolbarItems" :key="item.id">
+      <v-btn
+        ref="myButton"
+        class="ui-button"
+        icon
+        rounded="lg"
+        @click="item.callback"
+      >
         <v-icon>{{ item.icon }}</v-icon>
-        <NotImplementedDialog />
       </v-btn>
     </div>
   </div>
