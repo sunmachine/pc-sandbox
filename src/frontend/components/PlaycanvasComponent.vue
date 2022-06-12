@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Viewer } from "@/app/Viewer";
-import { ref, onMounted } from "vue";
+import type { Viewer } from "@/app/Viewer";
+import { ref, onMounted, inject } from "vue";
 import HudComponent from "./ui-hud/HudComponent.vue";
 
 const application = ref<HTMLCanvasElement | null>(null);
@@ -9,8 +9,11 @@ onMounted(() => {
   const pcCanvas = application.value;
   if (!pcCanvas) throw new Error("Cannot find canvas element.");
 
-  const viewer = new Viewer(pcCanvas);
-  viewer.start();
+  const viewer = inject<Viewer>("viewer");
+  if (viewer) {
+    viewer.initialize(pcCanvas);
+    viewer.start();
+  }
 });
 </script>
 

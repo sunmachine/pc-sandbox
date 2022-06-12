@@ -12,7 +12,7 @@ export class Viewer {
     return Viewer.#app;
   }
 
-  constructor(canvas: Element) {
+  initialize(canvas: Element) {
     this.setupApp(canvas);
     this.setupScene();
   }
