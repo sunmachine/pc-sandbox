@@ -2,16 +2,18 @@
 import type { Viewer } from "@/app/Viewer";
 import { inject, ref } from "vue";
 
-// https://materialdesignicons.com/ <--
 const viewer = inject<Viewer>("viewer");
+const getFunc = (name: string) => {
+  const func = viewer?.getFunction(name);
+  if (func) func();
+};
 
 const toolbarItems = ref([
   {
     id: 0,
+    // https://materialdesignicons.com/
     icon: "mdi-image-filter-center-focus",
-    callback: () => {
-      if (viewer?.camera) viewer?.camera?.focusOnEntity();
-    },
+    callback: () => getFunc("focusOnEntity"),
   },
 ]);
 </script>

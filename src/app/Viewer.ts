@@ -6,15 +6,8 @@ import { Light } from "./actors/Light";
 import { ModelContainer } from "./actors/ModelContainer";
 import { Skybox } from "./skybox/Skybox";
 
-export function focusOnEntity() {
-  const camera = Viewer["instance"].camera;
-  if (camera) {
-    camera.focusOnEntity();
-  }
-}
-
 export class Viewer {
-  camera?: Camera;
+  private readonly functionMap = new Map<string, () => void>();
 
   get app(): pc.Application {
     if (this.#app) return this.#app;
@@ -39,6 +32,9 @@ export class Viewer {
 
   start(): void {
     this.app.start();
+
+  getFunction(name: string) {
+    return this.functionMap.get(name);
   }
 
   private setupApp(canvas: Element) {
@@ -62,12 +58,14 @@ export class Viewer {
     Viewer.app.scene.envAtlas = envAtlas;
 
     // Create base actors.
-    this.camera = new Camera(root);
+    const camera = new Camera(root);
     new Light(root);
     new Grid(root);
-    new Compass(root, this.camera);
+    new Compass(root, camera);
 
-    const file = {
+    /** Register functions */
+    this.functionMap.set("focusOnEntity", () => camera.focusOnEntity());
+
       url: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/DamagedHelmet/glTF-Binary/DamagedHelmet.glb",
       filename: "DamagedHelmet.glb",
     };
