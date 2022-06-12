@@ -1,12 +1,16 @@
 <script setup lang="ts">
 import { ref } from "vue";
 
-const items = ref([{ label: "A" }, { label: "B" }, { label: "C" }]);
+const items = ref([
+  { id: 0, label: "A" },
+  { id: 3, label: "B" },
+  { id: 1, label: "C" },
+]);
 </script>
 
 <template>
   <div class="ui">
-    <div v-for="item in items">
+    <div v-for="item in items" :key="item.id">
       <v-btn class="ui-button" flat>{{ item.label }}</v-btn>
     </div>
   </div>
