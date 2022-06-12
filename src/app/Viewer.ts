@@ -4,6 +4,7 @@ import { Compass } from "./actors/Compass";
 import { Grid } from "./actors/Grid";
 import { Light } from "./actors/Light";
 import { ModelContainer } from "./actors/ModelContainer";
+import { SpinningCube } from "./actors/SpinningCube";
 import { Skybox } from "./skybox/Skybox";
 
 export class Viewer {
@@ -55,12 +56,18 @@ export class Viewer {
     /** Register functions */
     this.functionMap.set("focusOnEntity", () => camera.focusOnEntity());
 
-      url: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/DamagedHelmet/glTF-Binary/DamagedHelmet.glb",
-      filename: "DamagedHelmet.glb",
-    };
-
-    new ModelContainer(root).loadGltf(file, (entity) =>
-      camera.focusOnEntity(entity)
-    );
+    /** Conditional rendering of helmet based on metered connections... */
+    const metered = ["none", "cellular", undefined];
+    if (metered.includes(window.navigator.connection?.type)) {
+      new SpinningCube(root, new pc.StandardMaterial());
+    } else {
+      const file = {
+        url: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/DamagedHelmet/glTF-Binary/DamagedHelmet.glb",
+        filename: "DamagedHelmet.glb",
+      };
+      new ModelContainer(root).loadGltf(file, (entity) =>
+        camera.focusOnEntity(entity)
+      );
+    }
   }
 }
