@@ -1,5 +1,4 @@
 import * as pc from "playcanvas";
-import { Viewer } from "../Viewer";
 import { Actor } from "./Actor";
 
 export class Grid extends Actor {

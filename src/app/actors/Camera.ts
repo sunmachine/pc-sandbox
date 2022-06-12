@@ -3,7 +3,6 @@ import { Actor } from "./Actor";
 import { AnimatedVector } from "../types/AnimatedVector";
 import { SphericalCoords } from "../types/SphericalCoords";
 import type { Vector3 } from "../types/Vectors";
-import { Viewer } from "../Viewer";
 import { Direction, hasDirection } from "../types/Direction";
 import { degToRad } from "../types/Radians";
 import type { KeyMapping } from "../types/Keyboard";

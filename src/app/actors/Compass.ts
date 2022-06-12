@@ -1,6 +1,5 @@
 import type { CameraComponent } from "playcanvas";
 import * as pc from "playcanvas";
-import { Viewer } from "../Viewer";
 import { Actor } from "./Actor";
 import type { Camera } from "./Camera";
 
