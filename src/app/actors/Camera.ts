@@ -199,10 +199,18 @@ export class CameraInput {
     this._camera = camera;
 
     // Register controls.
-    Viewer.app.keyboard.on(pc.EVENT_KEYDOWN, (e) => this.onKeyDown(e));
-    Viewer.app.keyboard.on(pc.EVENT_KEYUP, (e) => this.onKeyUp(e));
-    Viewer.app.mouse.on(pc.EVENT_MOUSEMOVE, (e) => this.onMouseMove(e));
-    Viewer.app.mouse.on(pc.EVENT_MOUSEWHEEL, (e) => this.onMouseWheel(e));
+    pc.app.keyboard.on(pc.EVENT_KEYDOWN, (e: pc.KeyboardEvent) =>
+      this.onKeyDown(e)
+    );
+    pc.app.keyboard.on(pc.EVENT_KEYUP, (e: pc.KeyboardEvent) =>
+      this.onKeyUp(e)
+    );
+    pc.app.mouse.on(pc.EVENT_MOUSEMOVE, (e: pc.MouseEvent) =>
+      this.onMouseMove(e)
+    );
+    pc.app.mouse.on(pc.EVENT_MOUSEWHEEL, (e: pc.MouseEvent) =>
+      this.onMouseWheel(e)
+    );
   }
 
   update() {
@@ -216,7 +224,7 @@ export class CameraInput {
   private onKeyDown(evt: pc.KeyboardEvent) {
     this.keyMapping.forEach((map) => {
       if (
-        Viewer.app.keyboard.isPressed(map.key) &&
+        pc.app.keyboard.isPressed(map.key) &&
         !this._pressedKeys.has(map.key)
       ) {
         if (map.direction && !hasDirection(this.moveDirection, map.direction)) {
@@ -235,7 +243,7 @@ export class CameraInput {
   private onKeyUp(evt: pc.KeyboardEvent) {
     this.keyMapping.forEach((map) => {
       if (
-        !Viewer.app.keyboard.isPressed(map.key) &&
+        !pc.app.keyboard.isPressed(map.key) &&
         this._pressedKeys.has(map.key)
       ) {
         if (map.direction && hasDirection(this.moveDirection, map.direction)) {
@@ -253,8 +261,8 @@ export class CameraInput {
   }
 
   private onMouseMove(evt: pc.MouseEvent) {
-    if (Viewer.app.mouse.isPressed(pc.MOUSEBUTTON_LEFT)) {
-      if (Viewer.app.keyboard.isPressed(pc.KEY_SHIFT)) {
+    if (pc.app.mouse.isPressed(pc.MOUSEBUTTON_LEFT)) {
+      if (pc.app.keyboard.isPressed(pc.KEY_SHIFT)) {
         this._camera.pan(evt);
       } else {
         this._camera.orbit(evt);

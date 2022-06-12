@@ -14,7 +14,7 @@ export class GroundPlane extends Actor {
     super(root);
 
     const plane = new pc.Entity("plane");
-    const mesh = pc.createPlane(Viewer.app.graphicsDevice, this._planeOpts);
+    const mesh = pc.createPlane(pc.app.graphicsDevice, this._planeOpts);
     const meshInstance = new pc.MeshInstance(mesh, material);
 
     plane.addComponent("render", {

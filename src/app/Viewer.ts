@@ -9,53 +9,42 @@ import { Skybox } from "./skybox/Skybox";
 export class Viewer {
   private readonly functionMap = new Map<string, () => void>();
 
-  get app(): pc.Application {
-    if (this.#app) return this.#app;
-    throw new Error("This application is not initialized.");
-  }
-
-  static get app(): pc.Application {
-    return Viewer.instance.app;
-  }
-
-  #app?: pc.Application;
-  private static instance: Viewer;
-
-  constructor() {
-    Viewer.instance = this;
-  }
-
   initialize(canvas: Element) {
     this.setupApp(canvas);
     this.setupScene();
   }
 
   start(): void {
-    this.app.start();
+    if (pc.app === undefined) {
+      console.error("Cannot start yet. Remember to initialize the Viewer.");
+    } else {
+      pc.app.start();
+    }
+  }
 
   getFunction(name: string) {
     return this.functionMap.get(name);
   }
 
   private setupApp(canvas: Element) {
-    this.#app = new pc.Application(canvas, {
+    const app = new pc.Application(canvas, {
       elementInput: new pc.ElementInput(canvas),
       mouse: new pc.Mouse(canvas),
       keyboard: new pc.Keyboard(window),
     });
 
-    this.app.setCanvasFillMode(pc.FILLMODE_FILL_WINDOW);
-    this.app.setCanvasResolution(pc.RESOLUTION_AUTO);
-    window.addEventListener("resize", () => this.app.resizeCanvas());
+    app.setCanvasFillMode(pc.FILLMODE_FILL_WINDOW);
+    app.setCanvasResolution(pc.RESOLUTION_AUTO);
+    window.addEventListener("resize", () => app.resizeCanvas());
   }
 
   private setupScene() {
-    const root = Viewer.app.root;
+    const root = pc.app.root;
 
     // Setup Skybox.
     const { envAtlas, skybox } = new Skybox().generate();
-    Viewer.app.scene.skybox = skybox;
-    Viewer.app.scene.envAtlas = envAtlas;
+    pc.app.scene.skybox = skybox;
+    pc.app.scene.envAtlas = envAtlas;
 
     // Create base actors.
     const camera = new Camera(root);

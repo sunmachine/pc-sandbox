@@ -39,8 +39,8 @@ export class Compass extends Actor {
 
     // Hard-coded, position the compass at "90%" of screen height.
     const p = 0.9;
-    const cW = Viewer.app.graphicsDevice.width;
-    const cH = Viewer.app.graphicsDevice.height;
+    const cW = pc.app.graphicsDevice.width;
+    const cH = pc.app.graphicsDevice.height;
 
     // Determine screen positions.
     let x = cH * (1 - p);
@@ -97,6 +97,6 @@ export class Compass extends Actor {
     cam?.screenToWorld(ax, ay, 1, this.#start);
     cam?.screenToWorld(bx, by, 1, this.#end);
 
-    Viewer.app.drawLine(this.#start, this.#end, color, false);
+    pc.app.drawLine(this.#start, this.#end, color, false);
   }
 }

@@ -1,6 +1,5 @@
 import * as pc from "playcanvas";
 import { Gradient } from "../types/Color";
-import { Viewer } from "../Viewer";
 
 type SkyboxTextures = { envAtlas: pc.Texture; skybox: pc.Texture };
 
@@ -16,7 +15,7 @@ export class Skybox {
   ]);
 
   generate(): SkyboxTextures {
-    const t = new pc.Texture(Viewer.app.graphicsDevice, {
+    const t = new pc.Texture(pc.app.graphicsDevice, {
       format: pc.PIXELFORMAT_R8_G8_B8,
       width: this.x,
       height: this.y,

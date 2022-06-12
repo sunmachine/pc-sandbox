@@ -12,8 +12,8 @@ export class ModelContainer extends Actor {
     const asset = new pc.Asset(file.filename, "container", file);
     asset.once("load", (asset) => this.onLoad(asset, callback));
 
-    Viewer.app.assets.add(asset);
-    Viewer.app.assets.load(asset);
+    pc.app.assets.add(asset);
+    pc.app.assets.load(asset);
 
     return asset;
   }

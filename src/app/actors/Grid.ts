@@ -70,6 +70,6 @@ export class Grid extends Actor {
   }
 
   private drawLine() {
-    Viewer.app.drawLine(this.#start, this.#end, this.#color, true);
+    pc.app.drawLine(this.#start, this.#end, this.#color, true);
   }
 }

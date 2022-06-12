@@ -1,4 +1,4 @@
-import { Viewer } from "../Viewer";
+import * as pc from "playcanvas";
 export interface Actor {
   entity: pc.Entity;
   update?(dt: number): void;
@@ -7,7 +7,7 @@ export interface Actor {
 export abstract class Actor {
   constructor(protected root: pc.Entity) {
     if (this.update) {
-      Viewer.app.on("update", (dt) => this.update && this.update(dt));
+      pc.app.on("update", (dt: number) => this.update && this.update(dt));
     }
   }
 }

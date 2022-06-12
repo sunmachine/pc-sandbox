@@ -15,7 +15,7 @@ export class SpinningCube extends Actor {
     super(root);
 
     const cube = new pc.Entity("cube");
-    const mesh = pc.createBox(Viewer.app.graphicsDevice, this._cubeOpts);
+    const mesh = pc.createBox(pc.app.graphicsDevice, this._cubeOpts);
     const meshInstance = new pc.MeshInstance(mesh, material);
 
     cube.addComponent("render", {
