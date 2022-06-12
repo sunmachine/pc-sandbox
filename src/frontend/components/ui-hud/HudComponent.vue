@@ -1,12 +1,9 @@
 <script setup lang="ts">
 import { ref } from "vue";
+import NotImplementedDialog from "../dialog/NotImplementedDialog.vue";
 
 // https://materialdesignicons.com/ <--
-const items = ref([
-  { id: 0, icon: "mdi-file-upload" },
-  { id: 3, icon: "mdi-weather-sunset" },
-  { id: 1, icon: "mdi-image-filter-center-focus" },
-]);
+const items = ref([{ id: 0, icon: "mdi-image-filter-center-focus" }]);
 </script>
 
 <template>
@@ -14,6 +11,7 @@ const items = ref([
     <div v-for="item in items" :key="item.id">
       <v-btn class="ui-button" icon rounded="lg">
         <v-icon>{{ item.icon }}</v-icon>
+        <NotImplementedDialog />
       </v-btn>
     </div>
   </div>
