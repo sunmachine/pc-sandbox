@@ -6,10 +6,10 @@ import HudComponent from "./ui-hud/HudComponent.vue";
 const application = ref<HTMLCanvasElement | null>(null);
 
 onMounted(() => {
-  const canvas = application.value;
-  if (!canvas) throw new Error("Cannot find canvas element.");
+  const pcCanvas = application.value;
+  if (!pcCanvas) throw new Error("Cannot find canvas element.");
 
-  const viewer = new Viewer(canvas);
+  const viewer = new Viewer(pcCanvas);
   viewer.start();
 });
 </script>
