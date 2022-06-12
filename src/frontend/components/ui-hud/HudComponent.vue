@@ -9,7 +9,7 @@ const items = ref([
 </script>
 
 <template>
-  <div class="ui">
+  <div class="ui rounded-lg">
     <div v-for="item in items" :key="item.id">
       <v-btn class="ui-button" flat>{{ item.label }}</v-btn>
     </div>
@@ -21,14 +21,14 @@ const items = ref([
   position: absolute;
   bottom: 1.6rem;
   left: 1.6rem;
-  z-index: 1;
+
+  padding: 0.33em;
 
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  row-gap: 0.2em;
-}
+  row-gap: 0.33em;
 
-v-btn.button {
+  background-color: rgb(var(--v-theme-background));
 }
 </style>
