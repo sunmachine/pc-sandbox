@@ -16,6 +16,7 @@ specifiers:
   jsdom: ^19.0.0
   pinia: ^2.0.13
   playcanvas: ~1.53.4
+  pnpm: ^7.5.0
   prettier: ^2.5.1
   roboto-fontface: '*'
   typescript: ~4.6.3
@@ -32,6 +33,7 @@ dependencies:
   '@mdi/font': 5.9.55
   pinia: 2.0.14_3wx4hvlpf33h4r5e7sgliqloou
   playcanvas: 1.53.4
+  pnpm: 7.5.0
   roboto-fontface: 0.10.0
   vue: 3.2.37
   vuetify: 3.0.0-beta.3_vue@3.2.37
@@ -2017,6 +2019,12 @@ packages:
 
   /playcanvas/1.53.4:
     resolution: {integrity: sha512-M+uF92A5ihuRBhq7UpD93Z5ZABFvRvRohEYSODpgV/kat9Hgb51vNe3GOpMSTaOMHyHDBMKsIw1N0EQcBk3g6w==}
+    dev: false
+
+  /pnpm/7.5.0:
+    resolution: {integrity: sha512-sb9wJNyx/d8l3Gze2jI1y8BGNbb/ga+JT3SrGNiH+C5KbtZ4wmgePBWGjaiGugcpT9+vQ5MO//+QlVWhMCpedQ==}
+    engines: {node: '>=14.6'}
+    hasBin: true
     dev: false
 
   /postcss-selector-parser/6.0.10:
