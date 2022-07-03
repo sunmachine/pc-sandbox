@@ -54,7 +54,9 @@ export class Viewer {
     new Compass(root, camera);
 
     /** Register functions */
-    this.functionMap.set("focusOnEntity", () => camera.focusOnEntity());
+    this.functionMap
+      .set("focusOnEntity", () => camera.focusOnEntity())
+      .set("loadModel", () => {});
 
     const file = {
       url: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/DamagedHelmet/glTF-Binary/DamagedHelmet.glb",

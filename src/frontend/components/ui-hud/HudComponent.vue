@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Viewer } from "@/app/Viewer";
 import { inject, ref } from "vue";
+import NotImplementedDialog from "../dialog/NotImplementedDialog.vue";
 
 const viewer = inject<Viewer>("viewer");
 const getFunc = (name: string) => {
@@ -15,6 +16,11 @@ const toolbarItems = ref([
     icon: "mdi-image-filter-center-focus",
     callback: () => getFunc("focusOnEntity"),
   },
+  {
+    id: 1,
+    icon: "mdi-folder-open",
+    // callback: () => getFunc("loadModel"),
+  },
 ]);
 </script>
 
@@ -22,13 +28,14 @@ const toolbarItems = ref([
   <div class="ui rounded-lg">
     <div v-for="item in toolbarItems" :key="item.id">
       <v-btn
-        ref="myButton"
+        ref="hudButton"
         class="ui-button"
         icon
         rounded="lg"
-        @click="item.callback"
+        @click="() => item.callback && item.callback()"
       >
         <v-icon>{{ item.icon }}</v-icon>
+        <not-implemented-dialog v-if="item.callback === undefined" />
       </v-btn>
     </div>
   </div>
