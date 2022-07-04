@@ -1,18 +1,25 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import type { Viewer } from "@/app/Viewer";
+import { inject, ref } from "vue";
 
 const dialog = ref(false);
 const loading = ref(false);
-const props = defineProps<{
-  callback: (files: FileList) => Promise<void>;
-}>();
+
+const viewer = inject<Viewer>("viewer");
+const loadFromFile = async (file: File) => {
+  const func = viewer?.getFunction("loadFromFile");
+  if (func) func(file);
+};
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function onFileSelected(e: any): Promise<void> {
   const files = e.target?.files;
   if (files && files instanceof FileList) {
     loading.value = true;
-    if (props.callback) await props.callback(files);
+
+    // TODO: Just grab the first file.
+    const file = files[0];
+    if (file) await loadFromFile(file);
   } else {
     // Throw error.
     console.error("No files in list.");

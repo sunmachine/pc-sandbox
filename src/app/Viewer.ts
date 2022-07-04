@@ -11,7 +11,7 @@ import { Skybox } from "./skybox/Skybox";
 export class Viewer {
   private readonly functionMap = new Map<
     string,
-    (...args: unknown[]) => Promise<void> | void
+    (arg: unknown) => Promise<void> | void
   >();
 
   private actors = new Map<string, Actor>();
@@ -62,24 +62,13 @@ export class Viewer {
     /** Register functions */
     this.functionMap
       .set("focusOnEntity", () => camera.focusOnEntity())
-      .set("loadModel", async (args: unknown) => {
-        // Example:
-        // {
-        //   url: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/DamagedHelmet/glTF-Binary/DamagedHelmet.glb",
-        //   filename: "DamagedHelmet.glb",
-        // }
-
-        // TODO: Clean this up.
-
-        const files = (args as Array<FileList>)[0] as FileList;
-        const file = {
-          url: URL.createObjectURL(files[0]),
-          filename: files[0].name,
-        };
+      .set("loadFromFile", (arg: unknown) => {
+        const file = arg as File;
+        if (!file) return;
 
         const model = this.actors.get("model");
         if (model) {
-          model.entity.destroy();
+          model.entity?.destroy();
           this.actors.delete("model");
         }
 

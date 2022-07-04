@@ -8,13 +8,13 @@ interface ToolbarItems {
   id: number;
   icon: string;
   template?: string;
-  callback?: (...args: unknown[]) => void;
+  callback?: (arg?: unknown) => void;
 }
 
 const viewer = inject<Viewer>("viewer");
-const getFunc = (name: string, ...args: unknown[]) => {
+const getFunc = (name: string, arg?: unknown) => {
   const func = viewer?.getFunction(name);
-  if (func) func(args);
+  if (func) func(arg);
 };
 
 const toolbarItems = ref([
@@ -28,9 +28,6 @@ const toolbarItems = ref([
     id: 1,
     icon: "mdi-folder-open",
     template: "template-file-input",
-    callback: (files: FileList) => {
-      getFunc("loadModel", files);
-    },
   },
 ] as Array<ToolbarItems>);
 </script>
@@ -51,7 +48,6 @@ const toolbarItems = ref([
         />
         <file-input-dialog
           v-else-if="item?.template && item.template === 'template-file-input'"
-          :callback="async (files: FileList) => item.callback && item.callback(files)"
         />
       </v-btn>
     </div>

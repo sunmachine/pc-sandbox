@@ -1,15 +1,25 @@
 import * as pc from "playcanvas";
 import { Actor } from "./Actor";
-import type { File } from "../types/File";
 
 export class ModelContainer extends Actor {
   constructor(root: pc.Entity) {
     super(root);
   }
 
-  async loadGltf(file: File): Promise<pc.Entity> {
+  async loadGltf(input: File | string): Promise<pc.Entity> {
+    const isFile = input instanceof File;
+    const entry = isFile
+      ? {
+          url: URL.createObjectURL(input),
+          filename: input.name,
+        }
+      : {
+          url: input,
+          filename: input,
+        };
+
     return new Promise<pc.Entity>((resolve, reject) => {
-      const asset = new pc.Asset(file.filename, "container", file);
+      const asset = new pc.Asset(entry.filename, "container", entry);
       asset.once("load", (asset) => {
         this.onLoad(asset, (result: pc.Entity | unknown) => {
           if (result instanceof pc.Entity) resolve(result);
@@ -29,6 +39,7 @@ export class ModelContainer extends Actor {
       this.root.addChild(entity);
     }
 
+    this.entity = entity;
     callback(entity);
   }
 
