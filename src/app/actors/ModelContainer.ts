@@ -7,22 +7,29 @@ export class ModelContainer extends Actor {
     super(root);
   }
 
-  loadGltf(file: File, callback?: (entity: pc.Entity) => void): pc.Asset {
-    const asset = new pc.Asset(file.filename, "container", file);
-    asset.once("load", (asset) => this.onLoad(asset, callback));
+  async loadGltf(file: File): Promise<pc.Entity> {
+    return new Promise<pc.Entity>((resolve, reject) => {
+      const asset = new pc.Asset(file.filename, "container", file);
+      asset.once("load", (asset) => {
+        this.onLoad(asset, (result: pc.Entity | unknown) => {
+          if (result instanceof pc.Entity) resolve(result);
+          else reject(result);
+        });
+      });
 
-    pc.app.assets.add(asset);
-    pc.app.assets.load(asset);
-
-    return asset;
+      pc.app.assets.add(asset);
+      pc.app.assets.load(asset);
+    });
   }
 
-  private onLoad(asset: pc.Asset, callback?: (entity: pc.Entity) => void) {
+  private onLoad(asset: pc.Asset, callback: (entity: pc.Entity) => void) {
     const entity: pc.Entity = asset.resource.instantiateRenderEntity();
-    this.centerToTop(entity);
-    this.root.addChild(entity);
+    if (entity) {
+      this.centerToTop(entity);
+      this.root.addChild(entity);
+    }
 
-    if (callback) callback(entity);
+    callback(entity);
   }
 
   private centerToTop(entity: pc.Entity) {
@@ -30,6 +37,7 @@ export class ModelContainer extends Actor {
     const min = aabb.getMin();
     const pos = entity.getLocalPosition();
     pos.y -= min.y;
+
     entity.setPosition(pos);
   }
 }

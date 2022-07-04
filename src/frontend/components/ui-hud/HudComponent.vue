@@ -2,11 +2,19 @@
 import type { Viewer } from "@/app/Viewer";
 import { inject, ref } from "vue";
 import NotImplementedDialog from "../dialog/NotImplementedDialog.vue";
+import FileInputDialog from "../dialog/FileInputDialog.vue";
+
+interface ToolbarItems {
+  id: number;
+  icon: string;
+  template?: string;
+  callback?: (...args: unknown[]) => void;
+}
 
 const viewer = inject<Viewer>("viewer");
-const getFunc = (name: string) => {
+const getFunc = (name: string, ...args: unknown[]) => {
   const func = viewer?.getFunction(name);
-  if (func) func();
+  if (func) func(args);
 };
 
 const toolbarItems = ref([
@@ -19,9 +27,12 @@ const toolbarItems = ref([
   {
     id: 1,
     icon: "mdi-folder-open",
-    // callback: () => getFunc("loadModel"),
+    template: "template-file-input",
+    callback: (files: FileList) => {
+      getFunc("loadModel", files);
+    },
   },
-]);
+] as Array<ToolbarItems>);
 </script>
 
 <template>
@@ -32,10 +43,16 @@ const toolbarItems = ref([
         class="ui-button"
         icon
         rounded="lg"
-        @click="() => item.callback && item.callback()"
+        @click="() => !item?.template && item?.callback && item.callback()"
       >
         <v-icon>{{ item.icon }}</v-icon>
-        <not-implemented-dialog v-if="item.callback === undefined" />
+        <not-implemented-dialog
+          v-if="item.template === 'template-not-implemented'"
+        />
+        <file-input-dialog
+          v-else-if="item?.template && item.template === 'template-file-input'"
+          :callback="async (files: FileList) => item.callback && item.callback(files)"
+        />
       </v-btn>
     </div>
   </div>

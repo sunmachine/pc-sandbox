@@ -1,14 +1,20 @@
 import * as pc from "playcanvas";
+import type { Actor } from "./actors/Actor";
 import { Camera } from "./actors/Camera";
 import { Compass } from "./actors/Compass";
 import { Grid } from "./actors/Grid";
 import { Light } from "./actors/Light";
 import { ModelContainer } from "./actors/ModelContainer";
-import { SpinningCube } from "./actors/SpinningCube";
+// import { SpinningCube } from "./actors/SpinningCube";
 import { Skybox } from "./skybox/Skybox";
 
 export class Viewer {
-  private readonly functionMap = new Map<string, () => void>();
+  private readonly functionMap = new Map<
+    string,
+    (...args: unknown[]) => Promise<void> | void
+  >();
+
+  private actors = new Map<string, Actor>();
 
   initialize(canvas: Element) {
     this.setupApp(canvas);
@@ -49,22 +55,39 @@ export class Viewer {
 
     // Create base actors.
     const camera = new Camera(root);
-    new Light(root);
-    new Grid(root);
-    new Compass(root, camera);
+    this.actors.set("light", new Light(root));
+    this.actors.set("grid", new Grid(root));
+    this.actors.set("camera", new Compass(root, camera));
 
     /** Register functions */
     this.functionMap
       .set("focusOnEntity", () => camera.focusOnEntity())
-      .set("loadModel", () => {});
+      .set("loadModel", async (args: unknown) => {
+        // Example:
+        // {
+        //   url: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/DamagedHelmet/glTF-Binary/DamagedHelmet.glb",
+        //   filename: "DamagedHelmet.glb",
+        // }
 
-    const file = {
-      url: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/DamagedHelmet/glTF-Binary/DamagedHelmet.glb",
-      filename: "DamagedHelmet.glb",
-    };
+        // TODO: Clean this up.
 
-    new ModelContainer(root).loadGltf(file, (entity) =>
-      camera.focusOnEntity(entity)
-    );
+        const files = (args as Array<FileList>)[0] as FileList;
+        const file = {
+          url: URL.createObjectURL(files[0]),
+          filename: files[0].name,
+        };
+
+        const model = this.actors.get("model");
+        if (model) {
+          model.entity.destroy();
+          this.actors.delete("model");
+        }
+
+        const container = new ModelContainer(root);
+        container.loadGltf(file).then((entity) => {
+          camera.focusOnEntity(entity);
+          this.actors.set("model", container);
+        });
+      });
   }
 }
