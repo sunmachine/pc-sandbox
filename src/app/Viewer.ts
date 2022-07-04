@@ -5,15 +5,13 @@ import { Compass } from "./actors/Compass";
 import { Grid } from "./actors/Grid";
 import { Light } from "./actors/Light";
 import { ModelContainer } from "./actors/ModelContainer";
-// import { SpinningCube } from "./actors/SpinningCube";
+import { Water } from "./actors/Water";
 import { Skybox } from "./skybox/Skybox";
 
-export class Viewer {
-  private readonly functionMap = new Map<
-    string,
-    (arg: unknown) => Promise<void> | void
-  >();
+type CallbackFunc = (_arg?: unknown) => Promise<void> | void;
 
+export class Viewer {
+  private readonly functionMap = new Map<string, CallbackFunc>();
   private actors = new Map<string, Actor>();
 
   initialize(canvas: Element) {
@@ -58,6 +56,10 @@ export class Viewer {
     this.actors.set("light", new Light(root));
     this.actors.set("grid", new Grid(root));
     this.actors.set("camera", new Compass(root, camera));
+
+    const water = new Water(root);
+    this.actors.set("model", water);
+    camera.focusOnEntity(water.entity);
 
     /** Register functions */
     this.functionMap
