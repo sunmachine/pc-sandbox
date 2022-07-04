@@ -5,7 +5,7 @@ import { Compass } from "./actors/Compass";
 import { Grid } from "./actors/Grid";
 import { Light } from "./actors/Light";
 import { ModelContainer } from "./actors/ModelContainer";
-import { Water } from "./actors/Water";
+import { Water } from "./actors/water/Water";
 import { Skybox } from "./skybox/Skybox";
 
 type CallbackFunc = (_arg?: unknown) => Promise<void> | void;
