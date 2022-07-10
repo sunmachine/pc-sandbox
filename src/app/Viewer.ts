@@ -11,8 +11,8 @@ import { Skybox } from "./skybox/Skybox";
 type CallbackFunc = (_arg?: unknown) => Promise<void> | void;
 
 export class Viewer {
+  actors = new Map<string, Actor>();
   private readonly functionMap = new Map<string, CallbackFunc>();
-  private actors = new Map<string, Actor>();
 
   initialize(canvas: Element) {
     this.setupApp(canvas);
