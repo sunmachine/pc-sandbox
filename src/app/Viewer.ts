@@ -51,11 +51,36 @@ export class Viewer {
     pc.app.scene.skybox = skybox;
     pc.app.scene.envAtlas = envAtlas;
 
+    // Setup rendering layers.
+    // Assumes World's transparent layer is on index 3.
+    const layerComp = pc.app.scene.layers as pc.LayerComposition;
+    const waterVolume = new pc.Layer({
+      name: "WaterVolume",
+      opaqueSortMode: pc.SORTMODE_NONE,
+      transparentSortMode: pc.SORTMODE_BACK2FRONT,
+    });
+    const waterSurface = new pc.Layer({
+      name: "WaterSurface",
+      opaqueSortMode: pc.SORTMODE_NONE,
+      transparentSortMode: pc.SORTMODE_BACK2FRONT,
+    });
+
+    layerComp.insertTransparent(waterVolume, 3);
+    layerComp.insertTransparent(waterSurface, 4);
+
     // Create base actors.
     const camera = new Camera(root);
     this.actors.set("light", new Light(root));
     this.actors.set("grid", new Grid(root));
     this.actors.set("camera", new Compass(root, camera));
+
+    // Assign camera rendering layers.
+    if (camera.entity.camera) {
+      const updatedLayers = new Array<number>(...camera.entity.camera.layers);
+      updatedLayers.push(waterVolume.id);
+      updatedLayers.push(waterSurface.id);
+      camera.entity.camera.layers = updatedLayers;
+    }
 
     const water = new Water(root);
     this.actors.set("model", water);
