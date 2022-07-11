@@ -17,7 +17,7 @@ export type WaterMaterialType = "volume" | "surface";
 
 export class WaterMaterial extends Material {
   private time: number;
-  private type: WaterMaterialType;
+  type: WaterMaterialType;
 
   constructor(type: WaterMaterialType) {
     super();
