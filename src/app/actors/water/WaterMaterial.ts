@@ -5,22 +5,28 @@ import {
   Material,
   Shader,
 } from "playcanvas";
-import vertexShader from "../../shaders/basicvertex.glsl";
-import fragmentShader from "../../shaders/basicfragment.glsl";
+import volumeVert from "../../shaders/watervolume_vert.glsl";
+import volumeFrag from "../../shaders/watervolume_frag.glsl";
+import surfaceVert from "../../shaders/watersurface_vert.glsl";
+import surfaceFrag from "../../shaders/watersurface_frag.glsl";
+
+export type WaterMaterialType = "volume" | "surface";
 
 export class WaterMaterial extends Material {
   private time: number;
+  private type: WaterMaterialType;
 
-  constructor() {
+  constructor(type: WaterMaterialType) {
     super();
 
+    this.type = type;
     this.shader = new Shader(app.graphicsDevice, {
       attributes: {
         a_position: SEMANTIC_POSITION,
         a_uv0: SEMANTIC_TEXCOORD0,
       },
-      vshader: vertexShader,
-      fshader: fragmentShader,
+      vshader: type === "volume" ? volumeVert : surfaceVert,
+      fshader: type === "volume" ? volumeFrag : surfaceFrag,
     });
 
     this.time = 0;
