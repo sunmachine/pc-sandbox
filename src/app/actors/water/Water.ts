@@ -51,5 +51,38 @@ export class Water extends Actor {
     this.volumeMat.updateParameters(dt);
     this.surfaceMat.updateParameters(dt);
   }
+
+  static setupPrerequisites(scene?: pc.Scene, camera?: pc.CameraComponent) {
+    const layers = scene?.layers;
+
+    // Assumes World's transparent layer is on index 3.
+    if (layers) {
+      if (!layers.getLayerById(LAYER_WATERVOLUME)) {
+        const waterVolume = new pc.Layer({
+          name: "WaterVolume",
+          id: LAYER_WATERVOLUME,
+          opaqueSortMode: pc.SORTMODE_NONE,
+          transparentSortMode: pc.SORTMODE_BACK2FRONT,
+        });
+
+        layers.insertTransparent(waterVolume, 3);
+      }
+
+      if (!layers.getLayerById(LAYER_WATERSURFACE)) {
+        const waterSurface = new pc.Layer({
+          name: "WaterSurface",
+          id: LAYER_WATERSURFACE,
+          opaqueSortMode: pc.SORTMODE_NONE,
+          transparentSortMode: pc.SORTMODE_BACK2FRONT,
+        });
+
+        layers.insertTransparent(waterSurface, 4);
+      }
+    }
+
+    if (camera) {
+      addLayer(camera, LAYER_WATERVOLUME);
+      addLayer(camera, LAYER_WATERSURFACE);
+    }
   }
 }
