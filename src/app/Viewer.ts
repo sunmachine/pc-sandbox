@@ -5,16 +5,14 @@ import { Compass } from "./actors/Compass";
 import { Grid } from "./actors/Grid";
 import { Light } from "./actors/Light";
 import { ModelContainer } from "./actors/ModelContainer";
-// import { SpinningCube } from "./actors/SpinningCube";
+import { Water } from "./actors/water/Water";
 import { Skybox } from "./skybox/Skybox";
 
-export class Viewer {
-  private readonly functionMap = new Map<
-    string,
-    (arg: unknown) => Promise<void> | void
-  >();
+type CallbackFunc = (_arg?: unknown) => Promise<void> | void;
 
-  private actors = new Map<string, Actor>();
+export class Viewer {
+  actors = new Map<string, Actor>();
+  private readonly functionMap = new Map<string, CallbackFunc>();
 
   initialize(canvas: Element) {
     this.setupApp(canvas);
@@ -53,11 +51,19 @@ export class Viewer {
     pc.app.scene.skybox = skybox;
     pc.app.scene.envAtlas = envAtlas;
 
-    // Create base actors.
+    // Setup rendering.
     const camera = new Camera(root);
+    this.actors.set("camera", camera);
+    Water.setupPrerequisites(pc.app.scene, camera.entity.camera);
+
+    // Create base actors.
     this.actors.set("light", new Light(root));
     this.actors.set("grid", new Grid(root));
-    this.actors.set("camera", new Compass(root, camera));
+    this.actors.set("compass", new Compass(root, camera));
+
+    const water = new Water(root);
+    this.actors.set("model", water);
+    camera.focusOnEntity(water.entity);
 
     /** Register functions */
     this.functionMap
