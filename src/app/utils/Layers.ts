@@ -1,4 +1,9 @@
-type WithLayers = { layers: Array<number> };
+type WithLayers =
+  | { layers: Array<number> }
+  | {
+      set layers(arg: number[]);
+      get layers(): number[];
+    };
 
 /** @returns True when updated, false when not. */
 export function addLayer(obj: WithLayers, newLayer: number): boolean {

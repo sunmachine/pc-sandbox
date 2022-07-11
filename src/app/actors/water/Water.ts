@@ -18,11 +18,6 @@ export class Water extends Actor {
 
     this.volumeMat = new WaterMaterial("volume");
     this.surfaceMat = new WaterMaterial("surface");
-
-    this.volumeMat.cull = pc.CULLFACE_FRONT;
-    this.surfaceMat.cull = pc.CULLFACE_BACK;
-    this.volumeMat.blendType = this.surfaceMat.blendType = pc.BLEND_NORMAL;
-
     const volumeMesh = new MeshInstance(mesh, this.volumeMat);
     const surfaceMesh = new MeshInstance(mesh, this.surfaceMat);
 
@@ -32,14 +27,15 @@ export class Water extends Actor {
     parent.addChild(volumeEntity);
     parent.addChild(surfaceEntity);
 
-    volumeEntity.addComponent("render", {
+    const volumeRender = volumeEntity.addComponent("render", {
       meshInstances: [volumeMesh],
-    });
-    surfaceEntity.addComponent("render", {
-      meshInstances: [surfaceMesh],
-    });
+    }) as pc.RenderComponent;
+    addLayer(volumeRender, LAYER_WATERVOLUME);
 
-    volumeEntity.render?.layers;
+    const surfaceRender = surfaceEntity.addComponent("render", {
+      meshInstances: [surfaceMesh],
+    }) as pc.RenderComponent;
+    addLayer(surfaceRender, LAYER_WATERSURFACE);
 
     this.root.addChild(parent);
     parent.setPosition(0, 0.5, 0);

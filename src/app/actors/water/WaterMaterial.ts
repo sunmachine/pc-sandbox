@@ -4,6 +4,9 @@ import {
   SEMANTIC_TEXCOORD0,
   Material,
   Shader,
+  CULLFACE_FRONT,
+  CULLFACE_BACK,
+  BLEND_NORMAL,
 } from "playcanvas";
 import volumeVert from "../../shaders/watervolume_vert.glsl";
 import volumeFrag from "../../shaders/watervolume_frag.glsl";
@@ -28,6 +31,9 @@ export class WaterMaterial extends Material {
       vshader: type === "volume" ? volumeVert : surfaceVert,
       fshader: type === "volume" ? volumeFrag : surfaceFrag,
     });
+
+    this.cull = type === "volume" ? CULLFACE_FRONT : CULLFACE_BACK;
+    this.blendType = BLEND_NORMAL;
 
     this.time = 0;
   }
