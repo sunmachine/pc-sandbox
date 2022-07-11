@@ -40,7 +40,6 @@ export class WaterMaterial extends Material {
 
   updateParameters(dt: number): void {
     this.time += dt;
-
     this.setParameter("time", this.time % 1.0);
   }
 }
