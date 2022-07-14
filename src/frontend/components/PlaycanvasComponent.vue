@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import type { Viewer } from "@/app/Viewer";
 import { ref, onMounted, inject } from "vue";
-import HudComponent from "./ui-hud/HudComponent.vue";
+import QuickMenu from "./ui-hud/QuickMenu.vue";
+import ToolPanel from "./ui-hud/ToolPanel.vue";
 
 const application = ref<HTMLCanvasElement | null>(null);
 
@@ -18,7 +19,8 @@ onMounted(() => {
 </script>
 
 <template>
-  <HudComponent id="hud" />
+  <QuickMenu id="quick-menu" />
+  <ToolPanel id="tools" />
   <canvas ref="application" id="playcanvas" />
 </template>
 
@@ -30,7 +32,7 @@ onMounted(() => {
   z-index: -1;
 }
 
-#hud {
+#quick-menu, #tools {
   z-index: 1;
 }
 </style>

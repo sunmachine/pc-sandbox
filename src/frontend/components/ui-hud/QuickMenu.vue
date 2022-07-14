@@ -4,7 +4,7 @@ import { inject, ref } from "vue";
 import NotImplementedDialog from "../dialog/NotImplementedDialog.vue";
 import FileInputDialog from "../dialog/FileInputDialog.vue";
 
-interface ToolbarItems {
+interface MenuItems {
   id: number;
   icon: string;
   template?: string;
@@ -12,12 +12,12 @@ interface ToolbarItems {
 }
 
 const viewer = inject<Viewer>("viewer");
-const getFunc = (name: string, arg?: unknown) => {
+function getFunc(name: string, arg?: unknown) {
   const func = viewer?.getFunction(name);
   if (func) func(arg);
 };
 
-const toolbarItems = ref([
+const menuItems = ref([
   {
     id: 0,
     // https://materialdesignicons.com/
@@ -29,12 +29,12 @@ const toolbarItems = ref([
     icon: "mdi-folder-open",
     template: "template-file-input",
   },
-] as Array<ToolbarItems>);
+] as Array<MenuItems>);
 </script>
 
 <template>
   <div class="ui rounded-lg">
-    <div v-for="item in toolbarItems" :key="item.id">
+    <div v-for="item in menuItems" :key="item.id">
       <v-btn
         ref="hudButton"
         class="ui-button"
