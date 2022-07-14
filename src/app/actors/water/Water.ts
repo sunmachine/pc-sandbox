@@ -11,7 +11,7 @@ export class Water extends Actor {
   private volumeMat: WaterMaterial;
   private surfaceMat: WaterMaterial;
 
-  constructor(root: pc.Entity) {
+  constructor(root: pc.Entity, position?: [number, number, number]) {
     super(root);
 
     const mesh = pc.createBox(pc.app.graphicsDevice);
@@ -38,7 +38,9 @@ export class Water extends Actor {
     addLayer(surfaceRender, LAYER_WATERSURFACE);
 
     this.root.addChild(parent);
-    parent.setPosition(0, 0.5, 0);
+
+    if (!position) position = [0, 0.5, 0];
+    parent.setPosition(...position);
 
     this.entity = parent;
   }
