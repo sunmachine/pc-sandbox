@@ -1,6 +1,5 @@
 import type { Transform } from "@/shared/Transform";
 import * as pc from "playcanvas";
-import type { Actor } from "./actors/Actor";
 import { Camera } from "./actors/Camera";
 import { Compass } from "./actors/Compass";
 import { Grid } from "./actors/Grid";
@@ -8,10 +7,11 @@ import { Light } from "./actors/Light";
 import { ModelContainer } from "./actors/ModelContainer";
 import { Water } from "./actors/water/Water";
 import { Skybox } from "./skybox/Skybox";
-import type { ViewerCommands } from "./types/ViewerCommands";
+import type { RegisteredSceneActors } from "./scene/RegisteredSceneActors";
+import type { ViewerCommands } from "./ViewerCommands";
 
 export class Viewer {
-  actors = new Map<string, Actor>();
+  actors: RegisteredSceneActors = {};
   functions?: ViewerCommands;
 
   initialize(canvas: Element) {
@@ -50,29 +50,29 @@ export class Viewer {
 
     // Setup rendering.
     const camera = new Camera(root);
-    this.actors.set("camera", camera);
+    this.actors.camera = camera;
     Water.setupPrerequisites(pc.app.scene, camera.entity.camera);
 
     // Create base actors.
-    this.actors.set("light", new Light(root));
-    this.actors.set("grid", new Grid(root));
-    this.actors.set("compass", new Compass(root, camera));
+    this.actors.light = new Light(root);
+    this.actors.grid = new Grid(root);
+    this.actors.compass = new Compass(root, camera);
 
     const water = new Water(root);
-    this.actors.set("model", water);
+    this.actors.activeActor = water;
     camera.focusOnEntity(water.entity);
   }
 
   private registerFunctions() {
     const root = pc.app.root;
-    const camera = this.actors.get("camera") as Camera;
+    const camera = this.actors.camera;
 
     this.functions = {
       focusOnEntity: () => {
-        camera.focusOnEntity(this.actors.get("model")?.entity);
+        camera?.focusOnEntity(this.actors.activeActor?.entity);
       },
       getTransform: () => {
-        const actor = this.actors.get("model");
+        const actor = this.actors.activeActor;
         if (!actor?.entity) {
           throw new Error(
             `Cannot find registered entity. Unable to get transform: ${actor}`
@@ -89,7 +89,7 @@ export class Viewer {
         } as Transform;
       },
       updateTransform: (transform: Transform) => {
-        const actor = this.actors.get("model");
+        const actor = this.actors.activeActor;
         if (!actor?.entity) {
           throw new Error(
             `Cannot find registered entity. Unable to update transform: ${actor}`
@@ -107,16 +107,16 @@ export class Viewer {
         }
       },
       loadFromFile: async (file: File) => {
-        const model = this.actors.get("model");
+        const model = this.actors.activeActor;
         if (model) {
           model.entity?.destroy();
-          this.actors.delete("model");
+          this.actors.activeActor = undefined;
         }
 
         const container = new ModelContainer(root);
         return container.loadGltf(file).then((entity) => {
-          camera.focusOnEntity(entity);
-          this.actors.set("model", container);
+          camera?.focusOnEntity(entity);
+          this.actors.activeActor = container;
         });
       },
     };
