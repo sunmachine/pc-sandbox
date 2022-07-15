@@ -1,18 +1,26 @@
 <script setup lang="ts">
-
+import Transforms from "./Transforms.vue";
 </script>
 
 <template>
-<div class="ui rounded-lg">
-Test
-</div>
+  <div class="ui rounded-lg">
+    <v-expansion-panels>
+      <v-expansion-panel variant="accordian" title="Transform">
+        <v-expansion-panel-text>
+          <Transforms />
+        </v-expansion-panel-text>
+      </v-expansion-panel>
+    </v-expansion-panels>
+  </div>
 </template>
 
 <style scoped>
 .ui {
   position: absolute;
-  bottom: 1.6rem;
-  right: 1.6rem;
+  bottom: 1rem;
+  right: 1rem;
+
+  width: 460px;
 
   padding: 0.33em;
 
