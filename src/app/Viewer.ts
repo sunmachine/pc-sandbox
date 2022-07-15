@@ -68,7 +68,9 @@ export class Viewer {
     const camera = this.actors.get("camera") as Camera;
 
     this.functions = {
-      focusOnEntity: () => camera.focusOnEntity(),
+      focusOnEntity: () => {
+        camera.focusOnEntity(this.actors.get("model")?.entity);
+      },
       getTransform: () => {
         const actor = this.actors.get("model");
         if (!actor?.entity) {
