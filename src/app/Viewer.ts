@@ -1,3 +1,4 @@
+import type { Transform } from "@/shared/Transform";
 import * as pc from "playcanvas";
 import type { Actor } from "./actors/Actor";
 import { Camera } from "./actors/Camera";
@@ -7,16 +8,16 @@ import { Light } from "./actors/Light";
 import { ModelContainer } from "./actors/ModelContainer";
 import { Water } from "./actors/water/Water";
 import { Skybox } from "./skybox/Skybox";
-
-type CallbackFunc = (_arg?: unknown) => Promise<void> | void;
+import type { ViewerCommands } from "./types/ViewerCommands";
 
 export class Viewer {
   actors = new Map<string, Actor>();
-  private readonly functionMap = new Map<string, CallbackFunc>();
+  functions?: ViewerCommands;
 
   initialize(canvas: Element) {
     this.setupApp(canvas);
     this.setupScene();
+    this.registerFunctions();
   }
 
   start(): void {
@@ -25,10 +26,6 @@ export class Viewer {
     } else {
       pc.app.start();
     }
-  }
-
-  getFunction(name: string) {
-    return this.functionMap.get(name);
   }
 
   private setupApp(canvas: Element) {
@@ -64,14 +61,50 @@ export class Viewer {
     const water = new Water(root);
     this.actors.set("model", water);
     camera.focusOnEntity(water.entity);
+  }
 
-    /** Register functions */
-    this.functionMap
-      .set("focusOnEntity", () => camera.focusOnEntity())
-      .set("loadFromFile", (arg: unknown) => {
-        const file = arg as File;
-        if (!file) return;
+  private registerFunctions() {
+    const root = pc.app.root;
+    const camera = this.actors.get("camera") as Camera;
 
+    this.functions = {
+      focusOnEntity: () => camera.focusOnEntity(),
+      getTransform: () => {
+        const actor = this.actors.get("model");
+        if (!actor?.entity) {
+          throw new Error(
+            `Cannot find registered entity. Unable to get transform: ${actor}`
+          );
+        }
+
+        const p = actor.entity.getPosition();
+        const r = actor.entity.getLocalEulerAngles();
+        const s = actor.entity.getLocalScale();
+        return {
+          position: [p.x, p.y, p.z],
+          rotation: [r.x, r.y, r.z],
+          scale: [s.x, s.y, s.z],
+        } as Transform;
+      },
+      updateTransform: (transform: Transform) => {
+        const actor = this.actors.get("model");
+        if (!actor?.entity) {
+          throw new Error(
+            `Cannot find registered entity. Unable to update transform: ${actor}`
+          );
+        }
+
+        if (transform?.position) {
+          actor.entity.setPosition(...transform.position);
+        }
+        if (transform?.rotation) {
+          actor.entity.setLocalEulerAngles(...transform.rotation);
+        }
+        if (transform?.scale) {
+          actor.entity.setLocalScale(...transform.scale);
+        }
+      },
+      loadFromFile: async (file: File) => {
         const model = this.actors.get("model");
         if (model) {
           model.entity?.destroy();
@@ -79,10 +112,11 @@ export class Viewer {
         }
 
         const container = new ModelContainer(root);
-        container.loadGltf(file).then((entity) => {
+        return container.loadGltf(file).then((entity) => {
           camera.focusOnEntity(entity);
           this.actors.set("model", container);
         });
-      });
+      },
+    };
   }
 }
