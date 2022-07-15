@@ -12,17 +12,13 @@ interface MenuItems {
 }
 
 const viewer = inject<Viewer>("viewer");
-function getFunc(name: string, arg?: unknown) {
-  const func = viewer?.getFunction(name);
-  if (func) func(arg);
-};
 
 const menuItems = ref([
   {
     id: 0,
     // https://materialdesignicons.com/
     icon: "mdi-image-filter-center-focus",
-    callback: () => getFunc("focusOnEntity"),
+    callback: () => viewer?.functions.focusOnEntity(),
   },
   {
     id: 1,
@@ -35,20 +31,11 @@ const menuItems = ref([
 <template>
   <div class="ui rounded-lg">
     <div v-for="item in menuItems" :key="item.id">
-      <v-btn
-        ref="hudButton"
-        class="ui-button"
-        icon
-        rounded="lg"
-        @click="() => !item?.template && item?.callback && item.callback()"
-      >
+      <v-btn ref="hudButton" class="ui-button" icon rounded="lg"
+        @click="() => !item?.template && item?.callback && item.callback()">
         <v-icon>{{ item.icon }}</v-icon>
-        <not-implemented-dialog
-          v-if="item.template === 'template-not-implemented'"
-        />
-        <file-input-dialog
-          v-else-if="item?.template && item.template === 'template-file-input'"
-        />
+        <not-implemented-dialog v-if="item.template === 'template-not-implemented'" />
+        <file-input-dialog v-else-if="item?.template && item.template === 'template-file-input'" />
       </v-btn>
     </div>
   </div>
