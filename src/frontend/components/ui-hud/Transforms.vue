@@ -1,14 +1,31 @@
 <script setup lang="ts">
+import type { Viewer } from '@/app/Viewer';
 import { useTransformStore } from '@/frontend/hooks/transform';
+import type { Transform } from '@/shared/Transform';
+import { inject } from 'vue';
 
 const vecSize = 3;
 const rowLabels = ["Position", "Rotation", "Scale"];
 const axisLabels = ["X", "Y", "Z"];
 
-const store = useTransformStore();
 function getInputId(i: number, j: number) {
   return `transform-input-${i}-${j}`;
 };
+
+const viewer = inject<Viewer>("viewer");
+const store = useTransformStore();
+
+store.$subscribe(
+  (_, state) => {
+    viewer?.functions.updateTransform({
+      position: state.position,
+      rotation: state.rotation,
+      scale: state.scale
+    } as Transform);
+  },
+  { detached: true });
+
+
 </script>
 
 <template>
